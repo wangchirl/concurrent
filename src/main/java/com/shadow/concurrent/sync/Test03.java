@@ -1,4 +1,4 @@
-package com.shadow.concurrent;
+package com.shadow.concurrent.sync;
 
 /**
  * @author shadow
@@ -116,21 +116,6 @@ package com.shadow.concurrent;
  *
  *    重量级锁：
  *    线程最终从用户态进入到内核态，操作系统来进行线程同步控制
- *
- *
- *
- *
- *
- *
- *
- *
- *
- *
- *
- *
- *
- *
- *
  *
  */
 public class Test03 {

@@ -19,7 +19,8 @@
   5、JVM中的同步是基于进入与退出监视器对象（管程对象）（Monitor）来实现的
      每个对象实例都会有一个Monitor对象，Monitor对象会和Java对象一同创建
      与销毁，Monitor对象是由C++来实现的（OpenJDK）
- 
+     http://hg.openjdk.java.net/jdk8u/jdk8u/hotspot/file/4ad2d6087d73/src/share/vm/runtime/objectMonitor.cpp`
+       
      当多个线程同时访问一段同步代码时，这些线程会被放到一个EntryList集合中，
      处于阻塞状态的线程都会被放到该列表中，接下来，当线程获取到对象的Monitor时，
      Monitor是依赖底层操作系统的mutex lock来实现互斥的，线程获取mutex成功，
@@ -125,10 +126,48 @@
      就可以执行完全部的同步代码块，从而提升了性能   
      
      
+
+### 死锁、活锁、饿死
+    1、死锁：线程1等待线程2互斥持有的资源，而线程2也在等待线程1互斥持有的资源，两个线程都无法继续执行
+    2、活锁：线程持续重试一个总是失败的操作，导致无法继续执行
+    3、饿死：线程一直被调度器延迟访问其赖以执行的资源，也许是调度器先于低优先级的线程而执行高优先级的线程，同时总是会有一个
+            高优先级的线程可以执行，饿死也叫做无限延迟
      
      
+    检测线程死锁的方法：
+    1、可视化工具
+      ① jvisualvm
+      ② jconsole
+      ③ jmc
+     2、命令行
+       jps -l ：找到 java程序进程号
+       jstack pid : 查看线程栈信息
      
      
+### Lock、Condition、AQS同步器     
+   
+     1、关于 Lock 与 synchronized 关键字在锁的处理上的重要差别：
+        ① 锁的获取方式：前者是通过程序代码的方式由开发者手工获取，后者是通过JVM来获取（无需开发者干预）
+        ② 具体实现方式：前者是通过Java代码的方式来实现，后者是通过JVM底层来实现（无需开发者关注）
+        ③ 锁的释放方式：前者务必通过unlock()方法在finally块中手工释放锁，后者是通过JVM来释放（无需开发者关注）
+        ④ 锁的具体类型：前者提供了多种锁，如公平锁、非公平锁，后者是非公平锁；二者都提供了可重入锁
      
      
+     2、Condition -> await()、signal()、signalAll() + Lock 类 [multiple wait sets]
+        Object    -> wait()、notify()、notifyAll() + synchronized 关键字 [waitSet + EntryList]
+       ①传统上，我可以通过synchronized关键字 + wait、notify、notifyAll 来实现多个线程之间的协调与通信，
+        整个过程都是JVM来帮助我们实现的，开发者无需（也无法）了解底层的实现细节
+       ②从JDK5开始，并发包提供了Lock、Condition（await、signal、signalAll）来实现多个线程之间的协调与通信，
+        整个过程都是由开发者来控制的，而且相比于传统方式，更加灵活，功能也更加强大
+        
+        
+     
+      
+  
+  
+  
+  
+### JMM
+    1、Java规范关于JMM的说明
+    https://docs.oracle.com/javase/specs/jls/se7/html/jls-17.html#jls-17.4     
          

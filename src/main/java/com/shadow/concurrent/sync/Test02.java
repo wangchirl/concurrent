@@ -1,4 +1,4 @@
-package com.shadow.concurrent;
+package com.shadow.concurrent.sync;
 
 /**
  * @author shadow
