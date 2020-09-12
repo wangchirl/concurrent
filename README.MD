@@ -1,22 +1,54 @@
-  ### synchronized 关键字
-  1、synchronized 的使用
-  > 修饰成员方法 => 锁的是当前对象
-  > 修饰静态方法 => 锁的是当前对象的class对象
- 
-  2、字节码层面：
-  > ACC_SYNCHRONIZED 方法（成员方法或静态方法）
-  > monitorenter
-  > monitorexit
+## 个人笔记整理 - Shadow
   
-  3、修饰代码块
-  > monitorenter
-  > monitorexit
-  > 一个 monitorenter 对应 monitorexit 可能是 1:1（抛异常情况）或1:2（一般情况）
+### Thread
+
+    1、Thread类的重要方法
+     ①、sleep()：睡眠一段时间
+     ②、yield()：让出cpu执行时间
+     ③、join()：等待另外一个线程结束
+     ④、start()：启动线程
+     ⑤、run()：真正执行的方法
+    
+    2、线程状态 Thread.State
+     ①、NEW ：线程新建状态 new Thread()
+     ②、RUNNABLE：可执行状态，包括READY和RUNNING，start()后
+       * READY：线程被挂起（CPU时间片耗完）、Thread.yield()
+       * RUNNING：线程调度器选中执行
+     ③、BLOCKED：阻塞状态，等待进入同步代码块的锁 
+     ④、WAITING：等待状态，o.wait()、t.join()、LockSupport.park()；通过o.notify()、o.notifyAll()、LockSupport.unpark()进入可执行状态
+     ⑤、TIMED_WAITING：超时等待状态，Thread.sleep(time)、o.wait(time)、t.join(time)、LockSupport.parkNanos()、LockSupport.parkUntil()；等待时间结束进入可执行状态
+     ⑥、TERMINATED：线程销毁状态
+
+   ![线程状态](./线程状态.png)
+   
+   
+    3、启动线程的方式
+     ①、new Thread() 方式
+     ②、new Runnable() 方式
+     ③、线程池ThreadPool方式
+   
+   
   
-  4、修饰方法（成员或静态方法）
-  > ACC_SYNCHRONIZED 访问修饰符来控制
+### synchronized 关键字
   
-  5、JVM中的同步是基于进入与退出监视器对象（管程对象）（Monitor）来实现的
+     1、synchronized 的使用
+      修饰成员方法 => 锁的是当前对象
+      修饰静态方法 => 锁的是当前对象的class对象
+    
+     2、字节码层面：
+      ACC_SYNCHRONIZED 方法（成员方法或静态方法）
+      monitorenter
+      monitorexit
+     
+     3、修饰代码块
+      monitorenter
+      monitorexit
+      一个 monitorenter 对应 monitorexit 可能是 1:1（抛异常情况）或1:2（一般情况）
+     
+     4、修饰方法（成员或静态方法）
+      ACC_SYNCHRONIZED 访问修饰符来控制
+     
+     5、JVM中的同步是基于进入与退出监视器对象（管程对象）（Monitor）来实现的
      每个对象实例都会有一个Monitor对象，Monitor对象会和Java对象一同创建
      与销毁，Monitor对象是由C++来实现的（OpenJDK）
      http://hg.openjdk.java.net/jdk8u/jdk8u/hotspot/file/4ad2d6087d73/src/share/vm/runtime/objectMonitor.cpp`
@@ -57,6 +89,8 @@
 	     PTHREAD_MUTEX_TIMED_NP类型动作相同，这样就保证了当不允许多次加锁时不会出现最简单情况下的死锁
 	  4、PTHREAD_MUTEX_ADAPTIVE_NP：适应锁，动作最简单的锁类型，仅仅等待解锁后重新竞争
 	  
+
+注意：<font color="red">**出现异常会导致锁的释放**</font>
 
 ### synchronized 锁升级
  
@@ -111,8 +145,12 @@
      若自旋失败（依然无法获取到锁），那么锁就会转化为重量级锁，在这种情况下，无法获取到锁的线程都会进入到Monitor（即内核态）
      自旋最大的一个特点就是避免了线程从用户态进入到内核态
  
-     重量级锁：
+     重量级锁：（自旋10次以后升级为重量级锁 - OS）
      线程最终从用户态进入到内核态，操作系统来进行线程同步控制	   
+
+### 自旋还是系统锁？
+    1、执行时间短（加锁代码），线程数少，用自旋
+    2、执行时间长，线程数多，用系统锁     
      
      
 ### JIT编译器对锁的优化    
@@ -124,7 +162,7 @@
      JIT编译器在执行动态编译时，若发现前后相邻的 synchronized 块使用的是同一个锁对象，那么它会把这几个 synchronized 块
      给合并为一个较大的同步块，这样做的好处在于线程在执行这些代码时，就无需频繁申请与释放锁了，从而达到申请与释放锁一次，
      就可以执行完全部的同步代码块，从而提升了性能   
-     
+     对应的锁细化：尽可能的减少synchronized块的代码量
      
 
 ### 死锁、活锁、饿死
@@ -142,7 +180,24 @@
      2、命令行
        jps -l ：找到 java程序进程号
        jstack pid : 查看线程栈信息
-     
+
+#### 总结：
+    1、synchronized(Object)
+       - 不能用String常量，Integer，Long
+       - 锁的是对象不是代码
+       - 代码块使用对象加锁时最好限定对象 final 修饰
+       - 成员方法锁的是当前对象 this
+       - 具体方法锁的是当前类Class对象
+       - 锁升级：偏向锁-自旋锁（轻量级锁）- 重量级锁
+       - 线程数少-自旋；多-重量级锁
+       - 操作耗时长-重量级锁
+   
+    2、volatile 
+       - 保证线程可见性：MESI、缓存一致性协议
+       - 禁止指令重排序（读写屏障：loadfence、storefence原语指令）
+       
+       
+       
      
 ### Lock、Condition、AQS同步器     
    
@@ -160,10 +215,162 @@
        ②从JDK5开始，并发包提供了Lock、Condition（await、signal、signalAll）来实现多个线程之间的协调与通信，
         整个过程都是由开发者来控制的，而且相比于传统方式，更加灵活，功能也更加强大
         
-        
+       Condition的方法：
+        1、await()：线程进入等待状态，并释放与之关联的Lock，直到被signalled或interrupted
+           四种情况被唤醒：
+           ① 别的线程调用了同一个 Condition 的 signal()方法且当前线程被选中为被唤醒的线程时
+           ② 别的线程调用同一个 Condition 的 signalAll()方法
+           ③ 别的线程 interrupts 中断当前线程且支持线程挂起中断
+           ④ 虚假唤醒发生
+           在所有情况下，在此方法可以返回当前线程之前必须重新获取与此 Condition 关联的锁
+        2、signal()：**唤醒一个等待的线程**，如果存在多个线程在 Condition 等待，则选择其中的一个进行唤醒，在 wait 返回前线程必须获取到关联的 Lock
+        3、signalAll()：**唤醒所有等待的线程** ，在 wait 返回前每个线程必须重新获取关联的 Lock       
+
+      **Condition 的使用自行查阅 ArrayBlockingQueue 的实现**
+    
+     3、Thread.sleep 与 await（或者是 Object的wait方法）的本质区别：
+        sleep方法本质上不会释放锁，而await会释放锁，并且在 signal 后，还需要重新获得锁才能继续执行（该行为与Object的wait方法完全一致）    
+    
+     4、综合运用 => Test02
+    
+    
+    
+### volatile 关键字
+    
+     volatile关键字主要有三方面的作用：
+      1、实现 long/double 类型变量的原子操作
+      2、防止指令重排序
+      3、实现变量的可见性
+    
+      当使用 volatile关键字修饰变量时，应用就不会从寄存器中获取该变量的值，而是从内存（高速缓存）中获取
+    
+      volatile与锁类似的地方有两点：
+       1、确保变量的内存可见性
+       2、防止指令重排序
+    
+      volatile可以确保对变量写操作的原子性，但不具备排他性
+      另外的重要一点在于：使用锁可能会导致线程的上下文切换（内核态与用户态之间的切换），但使用volatile并不会出现这种情况
+    
+      不能保证原子操作
+      volatile int a = b + 1;
+      volatile int a = a++;
+      一般这样用
+      volatile int count = 1;
+      volatile boolean flag = false;
+    
+      如果要实现volatile写操作的原子性，那么在等号右侧的赋值变量中就不能出现被多线程所共享的变量，哪怕这个变量也是被volatile修饰
+    
+      volatile Date date = new Date();
+    
+      防止指令重排序与实现变量的可见性都是通过一种手段来实现的：内存屏障（memory barrier）
+    
+      int a = 1;
+      String s = "hello";
+    
+      内存屏障（Release Barrier，释放屏障）
+      volatile boolean v = false; // 写操作
+      内存屏障（Store Barrier，存储屏障）
+    
+      Release Barrier：防止下面的volatile与上面的所有操作的指令重排序
+      Store Barrier：重要作用是刷新处理器缓存，结果是可以确保该存储屏障之前一切的操作所生成的结果对于其他处理器来说都可见
+    
+      内存屏障（Load Barrier，加载屏障）
+      boolean v1 = v; //读操作
+      内存屏障（Acquier Barrier，获取屏障）
+      int a = 1;
+      String s = "world";
+    
+      Load Barrier：可以刷新处理器缓存，同步其他处理器对该volatile遍历的修改结果
+      Acquire Barrier：可以防止上面的volatile读取操作与下面的所有操作语句的指令重排序
+    
+      对于volatile关键字冰冷的读写操作，本质上都是通过内存屏障来执行的
+      内存配置兼具了两方面的能力：1、防止指令重排序；2、实现变量内存的可见性
+    
+      1、对于读取操作来说，volatile可以确保该操作与其后续的所有读写操作都不会进行指令重排序
+      2、对于修改操作拉屎，volatile可以确保该操作与其上面的所有读写操作都不会进行指令重排序
+    
      
-      
+      volatile与锁的一些比较：
+       锁同样具备变量内存可见性与防止指令重排序的功能
+       
+       monitorenter
+       内存屏障（Acquier Barrier，获取屏障）
+       ...
+       内存屏障（Release Barrier，释放屏障）
+       monitorexit   
+    
+      volatile常见场景：
+       1、DCL（双重检查）单例 - 为了禁止指令重排序（CPU）
+       2、JUC并发包
+
+    
+### Java内存模型(JMM)以及 happens-before
+    
+       1、变量的原子性问题
+       2、变量的可见性问题
+       3、变量修改的时序性问题
+    
+       happens-before重要规则：
+       1、顺序执行规则（限定在单个线程上的）：该线程的每个动作都happen-before它的后面的动作
+       2、隐式锁（monitor）规则：一个线程的 unlock happen-before 另外一个线程的 lock，之前的线程对于同步代码块的所有执行结果对于后续获取锁的线程来说都是可见的
+       3、volatile读写规则：对于一个volatile变量的写操作一定会 happen-before后续对该变量的读操作
+       4、多线程的启动规则：Thread对象的start方法happen-before该线程run方法中的任何一个动作，包括在其中启动的任何子线程
+       5、多线程的终止规则：一个线程启动一个子线程，并且调用了子线程的join方法等待其结束，那么当子线程结束后，父线程的接下来的所有操作都可以看到子线程run方法中的执行结果
+       6、线程的中断规则：可以调用interrupt方法来中断线程，这个调用happen-before对该线程中断的检查（isInterrupted）
+        
+    
+    
+### synchronized与volatile
+    1、synchronized     
+     ①、保证线程可见性
+     ②、保证有序性（无法禁止指令重排序，由于同一时刻只能有一个线程执行，存在as-if-serial语义，因此保证有序性）
+     ③、保证原子性
+    2、volatile
+     ①、保证线程可见性
+     ②、禁止指令重排序
+     ③、无法保证原子性
+ 
+ 
+### 问题：为什么synchronized无法禁止指令重排序，却能保证有序性？
+    1、为了进一步提升计算机各方面能力，在硬件层面做了很多优化，如处理器优化和指令重排等，但是这些技术的引入就会导致有序性问题
+    2、最好的解决有序性问题的办法，就是禁止处理器优化和指令重排，就像volatile中使用内存屏障一样（读写屏障是为了禁止指令重排序）
+    3、在Java中，不管怎么排序，都不能影响单线程程序的执行结果。这就是as-if-serial语义，所有硬件优化的前提都是必须遵守as-if-serial语义
+    4、synchronized，他是Java提供的锁，可以通过他对Java中的对象加锁，并且他是一种排他的、可重入的锁
+    5、synchronized通过排他锁的方式就保证了同一时间内，被synchronized修饰的代码是单线程执行的。所以呢，这就满足了as-if-serial语义的一个关键前提，那就是单线程，因为有as-if-serial语义保证，单线程的有序性就天然存在了    
+    
   
+  
+  
+  
+  
+### CountDownLatch、CyclicBarrier  
+  
+    1、CountDownLatch => Test04
+     允许一个或多个线程等待在其他线程中执行的一组操作完成
+     ① countDown()：调用此方法需在 finally 块中，子任务每执行完一次调用一次
+     ② await()：主线程等待，直到维护的state变量值变为0，可多次等待，如果state已经是0则会立即执行 private volatile int state
+     ③ await(time)：超时等待，时间过来住线程立即执行，不会等待子线程全部执行完毕
+     ④ CountDownLatch 不可重用
+    
+    2、CyclicBarrier
+     栅栏，多个任务全部到达后（最后一个线程到达）再继续执行，不存在子任务的概念
+     ① await()：线程等待所有的任务到达屏障
+     ② await(time)：超时等待，会抛异常
+     ③ CyclicBarrier 可重用
+     > 底层执行逻辑：
+      1.初始化CyclicBarrier中的各种成员变量，包括parties、count和Runnable（可选）
+      2.当调用await方法时，底层会先检查计数器是否已经归零，如果是的话，那么就首先执行可选的Runnable，接下来开始下一个Generation
+      3.在下一个分代中，将会重置count值为parties，并且创建新的Generation实例
+      4.同时会调用Condition的signalAll方法，唤醒所有的在屏障前面等待的线程，让其开始继续执行
+      5.如果计数器没有归零，那么当前的调用线程将会通过Condition的await方法，在屏障前进行等待
+      6.以上所有执行流程均在Lock锁的控制范围内，不会出现并发问题（--count）
+  
+    3、更好的对 CountDownLatch 与 CyclicBarrier 的理解：==> Test05
+     CyclicBarrier：赛跑前先来的选手需要等待其他选手入场，然后进行比赛
+     CountDownLatch：需要等待所有赛跑选手到达目的地后才可结束比赛
+  
+
+### CAS  
   
   
   
