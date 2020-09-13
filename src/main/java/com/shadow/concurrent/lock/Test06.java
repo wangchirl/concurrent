@@ -15,14 +15,12 @@ package com.shadow.concurrent.lock;
  *   比较与交换：这是一个不断循环的过程，一直到变量值被修改成功为止；CAS本身是由硬件指令来提供支持的，换句话说，硬件中是通过
  *   一个原子指令来实现比较与交换的；因此，CAS可以确保变量操作的原子性
  *
- *
- *
  */
 public class Test06 {
 
 	private int count;
 
-	public int getCount(){
+	public /*synchronized*/ int getCount(){
 		return this.count;
 	}
 
@@ -32,7 +30,7 @@ public class Test06 {
 	 * 2、Lock
 	 * 3、ReadWriteLock
 	 */
-	public void increaseCount() {
+	public /*synchronized*/ void increaseCount() {
 		++this.count;
 	}
 

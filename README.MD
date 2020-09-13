@@ -30,6 +30,8 @@
    
   
 ### synchronized 关键字
+   
+   [关于C++代码Monitor对象加锁的底层实现](http://hg.openjdk.java.net/jdk8u/jdk8u/hotspot/file/4ad2d6087d73/src/share/vm/runtime/objectMonitor.cpp)
   
      1、synchronized 的使用
       修饰成员方法 => 锁的是当前对象
@@ -51,8 +53,7 @@
      5、JVM中的同步是基于进入与退出监视器对象（管程对象）（Monitor）来实现的
      每个对象实例都会有一个Monitor对象，Monitor对象会和Java对象一同创建
      与销毁，Monitor对象是由C++来实现的（OpenJDK）
-     http://hg.openjdk.java.net/jdk8u/jdk8u/hotspot/file/4ad2d6087d73/src/share/vm/runtime/objectMonitor.cpp`
-       
+      
      当多个线程同时访问一段同步代码时，这些线程会被放到一个EntryList集合中，
      处于阻塞状态的线程都会被放到该列表中，接下来，当线程获取到对象的Monitor时，
      Monitor是依赖底层操作系统的mutex lock来实现互斥的，线程获取mutex成功，
@@ -196,43 +197,7 @@
        - 保证线程可见性：MESI、缓存一致性协议
        - 禁止指令重排序（读写屏障：loadfence、storefence原语指令）
        
-       
-       
-     
-### Lock、Condition、AQS同步器     
-   
-     1、关于 Lock 与 synchronized 关键字在锁的处理上的重要差别：
-        ① 锁的获取方式：前者是通过程序代码的方式由开发者手工获取，后者是通过JVM来获取（无需开发者干预）
-        ② 具体实现方式：前者是通过Java代码的方式来实现，后者是通过JVM底层来实现（无需开发者关注）
-        ③ 锁的释放方式：前者务必通过unlock()方法在finally块中手工释放锁，后者是通过JVM来释放（无需开发者关注）
-        ④ 锁的具体类型：前者提供了多种锁，如公平锁、非公平锁，后者是非公平锁；二者都提供了可重入锁
-     
-     
-     2、Condition -> await()、signal()、signalAll() + Lock 类 [multiple wait sets]
-        Object    -> wait()、notify()、notifyAll() + synchronized 关键字 [waitSet + EntryList]
-       ①传统上，我可以通过synchronized关键字 + wait、notify、notifyAll 来实现多个线程之间的协调与通信，
-        整个过程都是JVM来帮助我们实现的，开发者无需（也无法）了解底层的实现细节
-       ②从JDK5开始，并发包提供了Lock、Condition（await、signal、signalAll）来实现多个线程之间的协调与通信，
-        整个过程都是由开发者来控制的，而且相比于传统方式，更加灵活，功能也更加强大
-        
-       Condition的方法：
-        1、await()：线程进入等待状态，并释放与之关联的Lock，直到被signalled或interrupted
-           四种情况被唤醒：
-           ① 别的线程调用了同一个 Condition 的 signal()方法且当前线程被选中为被唤醒的线程时
-           ② 别的线程调用同一个 Condition 的 signalAll()方法
-           ③ 别的线程 interrupts 中断当前线程且支持线程挂起中断
-           ④ 虚假唤醒发生
-           在所有情况下，在此方法可以返回当前线程之前必须重新获取与此 Condition 关联的锁
-        2、signal()：**唤醒一个等待的线程**，如果存在多个线程在 Condition 等待，则选择其中的一个进行唤醒，在 wait 返回前线程必须获取到关联的 Lock
-        3、signalAll()：**唤醒所有等待的线程** ，在 wait 返回前每个线程必须重新获取关联的 Lock       
-
-      **Condition 的使用自行查阅 ArrayBlockingQueue 的实现**
-    
-     3、Thread.sleep 与 await（或者是 Object的wait方法）的本质区别：
-        sleep方法本质上不会释放锁，而await会释放锁，并且在 signal 后，还需要重新获得锁才能继续执行（该行为与Object的wait方法完全一致）    
-    
-     4、综合运用 => Test02
-    
+          
     
     
 ### volatile 关键字
@@ -304,9 +269,8 @@
        2、JUC并发包
 
     
-### Java内存模型(JMM)以及 happens-before
-    
-       1、变量的原子性问题
+### Java内存模型(JMM)以及 happens-before [Java规范关于JMM的说明](https://docs.oracle.com/javase/specs/jls/se7/html/jls-17.html#jls-17.4)  
+       1、变量的原子性问题 
        2、变量的可见性问题
        3、变量修改的时序性问题
     
@@ -339,11 +303,158 @@
     5、synchronized通过排他锁的方式就保证了同一时间内，被synchronized修饰的代码是单线程执行的。所以呢，这就满足了as-if-serial语义的一个关键前提，那就是单线程，因为有as-if-serial语义保证，单线程的有序性就天然存在了    
     
   
+
+
+     
+### Lock、Condition、AQS同步器     
+   
+     1、关于 Lock 与 synchronized 关键字在锁的处理上的重要差别：
+        ① 锁的获取方式：前者是通过程序代码的方式由开发者手工获取，后者是通过JVM来获取（无需开发者干预）
+        ② 具体实现方式：前者是通过Java代码的方式来实现，后者是通过JVM底层来实现（无需开发者关注）
+        ③ 锁的释放方式：前者务必通过unlock()方法在finally块中手工释放锁，后者是通过JVM来释放（无需开发者关注）
+        ④ 锁的具体类型：前者提供了多种锁，如公平锁、非公平锁，后者是非公平锁；二者都提供了可重入锁
+     
+     
+     2、Condition -> await()、signal()、signalAll() + Lock 类 [multiple wait sets]
+        Object    -> wait()、notify()、notifyAll() + synchronized 关键字 [waitSet + EntryList]
+       ①传统上，我可以通过synchronized关键字 + wait、notify、notifyAll 来实现多个线程之间的协调与通信，
+        整个过程都是JVM来帮助我们实现的，开发者无需（也无法）了解底层的实现细节
+       ②从JDK5开始，并发包提供了Lock、Condition（await、signal、signalAll）来实现多个线程之间的协调与通信，
+        整个过程都是由开发者来控制的，而且相比于传统方式，更加灵活，功能也更加强大
+        
+       Condition的方法：
+        1、await()：线程进入等待状态，并释放与之关联的Lock，直到被signalled或interrupted
+           四种情况被唤醒：
+           ① 别的线程调用了同一个 Condition 的 signal()方法且当前线程被选中为被唤醒的线程时
+           ② 别的线程调用同一个 Condition 的 signalAll()方法
+           ③ 别的线程 interrupts 中断当前线程且支持线程挂起中断
+           ④ 虚假唤醒发生
+           在所有情况下，在此方法可以返回当前线程之前必须重新获取与此 Condition 关联的锁
+        2、signal()：**唤醒一个等待的线程**，如果存在多个线程在 Condition 等待，则选择其中的一个进行唤醒，在 wait 返回前线程必须获取到关联的 Lock
+        3、signalAll()：**唤醒所有等待的线程** ，在 wait 返回前每个线程必须重新获取关联的 Lock       
+
+      **Condition 的使用自行查阅 ArrayBlockingQueue 的实现**
+    
+     3、Thread.sleep 与 await（或者是 Object的wait方法）的本质区别：
+        sleep方法本质上不会释放锁，而await会释放锁，并且在 signal 后，还需要重新获得锁才能继续执行（该行为与Object的wait方法完全一致）    
+    
+     4、综合运用 => Test02  
   
   
+
+### CAS 、原子类 Atomicxxx、原子引用 AtomicReference/AtomicStampReference
+    1、CAS ==> Test07
+     ①、synchronized关键字与Lock等锁机制都是悲观锁：无论做任何操作，首先都需要先上锁，接下来再去执行后续操作，从而确保了
+       接下来的所有操作都是由当前这个线程来执行的
+     ②、乐观锁：线程在操作之前不会做任何预先处理，而是直接去执行；当在最后执行变量更新的时候，当前线程需要有一种机制来确保
+       当前被操作的变量是没有被其他线程修改的；CAS是乐观锁的一种极为重要的实现方式
+  
+     CAS（Compare And Swap/Set）
+     比较与交换：这是一个不断循环的过程，一直到变量值被修改成功为止；CAS本身是由硬件指令来提供支持的，换句话说，硬件中是通过
+     一个原子指令来实现比较与交换的；因此，CAS可以确保变量操作的原子性
   
   
-### CountDownLatch、CyclicBarrier  
+     对于CAS来说，其操作数主要涉及到如下三个：
+      1.需要被操作的内存值V（主内存值）
+      2.需要进行比较的值A（期望的值，即当前线程读取到的值）
+      3.需要进行写入的值B（更新值）
+     只有当V==A的时候，CAS才会通过原子操作的手段来将V的值更新成功，并且返回旧值
+   
+     关于CAS的限制或问题：
+      1.循环开销问题：并发量大的情况下会导致线程一直自旋
+      2.只能保证一个变量的原子操作：可以通过AtomicReference来实现对多个变量的原子操作
+      3.ABA问题：1 -> 2 -> 1，经过修改之后再改回来的问题
+      
+      ABA问题的解决办法：使用带版本号的原子引用 AtomicStampedReference
+       
+
+### 关于 synchronized、Atomic原子类、LongAdder的性能测试
+```java
+public class Test01 {
+	final Object lock = new Object();
+	static long count1 = 0L;
+	static AtomicLong count2 = new AtomicLong(0L);
+	static LongAdder count3 = new LongAdder();
+
+	public static void main(String[] args) throws InterruptedException {
+		Thread[] threads = new Thread[1000];
+		// synchronized
+		Test01 test01 = new Test01();
+		for (int i = 0; i < threads.length; i++) {
+			threads[i] = new Thread(() ->{
+				for (int j = 0; j < 100000; j++) {
+					test01.increment();
+				}
+			});
+		}
+		long start = System.currentTimeMillis();
+		for (Thread thread : threads) {
+			thread.start();
+		}
+		for (Thread thread : threads) {
+			thread.join();
+		}
+		System.out.println("值为："+ count1 +" sync 耗时：" + (System.currentTimeMillis() - start));
+
+		// atomic
+		for (int i = 0; i < threads.length; i++) {
+			threads[i] = new Thread(() ->{
+				for (int j = 0; j < 100000; j++) {
+					count2.getAndIncrement();
+				}
+			});
+		}
+		start = System.currentTimeMillis();
+		for (Thread thread : threads) {
+			thread.start();
+		}
+		for (Thread thread : threads) {
+			thread.join();
+		}
+		System.out.println("值为："+ count2.get() +" atomic 耗时：" + (System.currentTimeMillis() - start));
+
+		// longAdder
+		for (int i = 0; i < threads.length; i++) {
+			threads[i] = new Thread(() ->{
+				for (int j = 0; j < 100000; j++) {
+					count3.increment();
+				}
+			});
+		}
+		start = System.currentTimeMillis();
+		for (Thread thread : threads) {
+			thread.start();
+		}
+		for (Thread thread : threads) {
+			thread.join();
+		}
+		System.out.println("值为："+ count3.longValue() +" longAdder 耗时：" + (System.currentTimeMillis() - start));
+	}
+
+	public void increment() {
+		synchronized (lock){
+			count1++;
+		}
+	}
+}
+```
+
+
+
+### ReentrantLock、ReentrantReadWriteLock
+    1、ReentrantLock 方法
+     ① lock() ：加锁
+     ② unlock() ：释放锁
+     ③ tryLock() ：尝试加锁
+     ④ lockInterruptibly() ：可中断的加锁
+     ⑤ ReentrantLock(fair) ： 构造方法，可选择公平与非公平
+    2、ReentrantReadWriteLock 方法
+     ① readLock() ： 读锁
+     ② writeLock() ：写锁
+     ③ ReentrantReadWriteLock(fair) ：构造方法，可选择公平与非公平
+
+
+### CountDownLatch、CyclicBarrier、Phaser、Semaphore、Exchanger
   
     1、CountDownLatch => Test04
      允许一个或多个线程等待在其他线程中执行的一组操作完成
@@ -351,12 +462,13 @@
      ② await()：主线程等待，直到维护的state变量值变为0，可多次等待，如果state已经是0则会立即执行 private volatile int state
      ③ await(time)：超时等待，时间过来住线程立即执行，不会等待子线程全部执行完毕
      ④ CountDownLatch 不可重用
+     
     
-    2、CyclicBarrier
+    2、CyclicBarrier => Test05
      栅栏，多个任务全部到达后（最后一个线程到达）再继续执行，不存在子任务的概念
      ① await()：线程等待所有的任务到达屏障
      ② await(time)：超时等待，会抛异常
-     ③ CyclicBarrier 可重用
+     ③ CyclicBarrier(int,Runnable) ：构造方法
      > 底层执行逻辑：
       1.初始化CyclicBarrier中的各种成员变量，包括parties、count和Runnable（可选）
       2.当调用await方法时，底层会先检查计数器是否已经归零，如果是的话，那么就首先执行可选的Runnable，接下来开始下一个Generation
@@ -365,16 +477,124 @@
       5.如果计数器没有归零，那么当前的调用线程将会通过Condition的await方法，在屏障前进行等待
       6.以上所有执行流程均在Lock锁的控制范围内，不会出现并发问题（--count）
   
-    3、更好的对 CountDownLatch 与 CyclicBarrier 的理解：==> Test05
-     CyclicBarrier：赛跑前先来的选手需要等待其他选手入场，然后进行比赛
-     CountDownLatch：需要等待所有赛跑选手到达目的地后才可结束比赛
-  
+     > 更好的对 CountDownLatch 与 CyclicBarrier 的理解：==> Test05
+        CyclicBarrier：赛跑前先来的选手需要等待其他选手入场，然后进行比赛，栅栏可重用
+        CountDownLatch：需要等待所有赛跑选手到达目的地后才可结束比赛，闭锁不可重用
 
-### CAS  
-  
-  
-  
-### JMM
-    1、Java规范关于JMM的说明
-    https://docs.oracle.com/javase/specs/jls/se7/html/jls-17.html#jls-17.4     
+     3、Semaphore ==> Test08
+       信号量通常用于限制线程的数量访问一些(物理或逻辑)资源。举个例子一个使用信号量来控制访问资源的线程数量
+       ① acquire() ：获取锁，阻塞方法
+       ② release() : 释放锁
+       ③ Semaphore(int) ：构造方法，指定限定数
+       ③ Semaphore(int, fair) ：构造方法，指定限定数及是否公平
+       
+      > 限流 => 类比高速收费站
+     
+     4、Phaser => Test09
+       多个栅栏，可看做是CountDownLatch和CyclicBarrier的结合
+       ① bulkRegister(int) ：规定桶的数量
+       ② arriveAndAwaitAdvance() ：继续参与下一个栅栏
+       ③ arriveAndDeregister() ：不在参与下一个栅栏
+       ④ onAdvance() ： 栅栏被推倒的时候自动回调的方法
+      
+     5、Exchanger => Test10
+      ① exchange(r)：交换
+      ② exchange(r,t,u)：超时交换
+      > 只能是2个线程间的数据交互；如游戏中2个人交换装备
+      
+
+### ReentrantLock（Lock） 与 ReentrantReadWriteLock（ReadWriteLock）
+    二者性能测试 => Test11
+    1、ReentrantLock
+     ① lock()
+     ② unlock()
+     
+     对于ReentrantLock来说，其执行逻辑如下所示：
+     1. 尝试获取对象的锁，如果获取不到（意味着已经有其他线程持有了锁，并且尚未释放），那么它就会进入到AQS的阻塞队列中。
+     2. 如果获取到，那么根据所是个公平锁还是非公平屁锁来进行不同的处理：
+       ① 如果是公平锁，那么线程会直接放置到AQS阻塞队列的末尾
+       ② 如果是非公平锁，那么线程会首先尝试进行CAS计算，如果成功，则直接获取到锁
+         如果失败，则与公平锁的处理方式一致，被放到阻塞队列末尾
+     3. 当锁释放时（调用unlock方法），那么底层会调用release方法对state成员变量值进行减一操作，如果减一后，state值不为0
+        那么release操作就执行完毕；如果减一操作后，state值为0，则调用LockSupport的unpark方法唤醒该线程后的等待队列中的
+        第一个后续线程，将其唤醒，使之能够获取到对象的锁（release时，对于公平锁与非公平锁的处理逻辑是一致的）；之所以调用
+        release方法后state值可能不为零，原因在于ReentrantLock是可重入锁，表示线程可以调用多次lock方法，导致每调用一次
+        state的值都会加一
+      
+      对于ReentrantLock来说，所谓的上锁，本质上就是对AQS中的state成员变量的操作：对state+1表示上锁；对state-1表示释放锁
+        
+     
+    2、ReentrantReadWriteLock
+     ① readLock().lock()
+     ② readLock().unlock()
+     ③ writeLock().lock()      
+     ④ writeLock().unlock()      
+    > 读锁共享锁、写锁互斥锁
+    
+     关于ReentrantReadWriteLock的执行逻辑：
+     1. 读锁：
+       ① 在获取读锁时，会尝试判断当前对象是否拥有了写锁，如果已经拥有，则直接失败
+       ② 如果没有写锁，就表示当前对象没有排它锁，则当前线程会尝试给对象加锁
+       ③ 如果当前线程已经持有了搞对象的锁，那么直接将读锁数量+1
+       
+     2. 写锁：
+       ① 在获取写锁时，会尝试判断当前对象是否拥有了锁（读锁与写锁），如果已经拥有且持有的线程并非当前线程，直接失败
+       ② 如果当前对象没有被加锁，那么写锁就会为当前对象上锁，并且将写锁的个数+1
+       ③ 将当前对象的排它锁线程持有者设为自己
+       
+       
+
+### ReentrantLock 与 synchronized 比较
+    1、CAS 与 synchronized锁升级
+    2、tryLock 尝试获取锁
+    3、lockInterruptibly 可被中断
+    4、ReentrantLock可实现公平与非公平
+
+
+### <font color="blue">AQS（AbstractQueuedSynchronizer）抽象队列同步器</font>
+    
+    1、ConditionObject impl Condition ，其中每一个Condition都维护了一个等待队列（类似synchronized中的 waitSet）=> await()、signal()、signalAll()
+    2、Node 双向阻塞队列FIFO（类似synchronized中的EntryList），持有线程对象
+    3、private volatile int state; 同步状态，在不同的实现中作用不一样
+      ① ReentrantLock - 加锁状态，为 0 时则表示未加锁状态，大于0则表示加锁状态（可重入锁）
+      ② ReentrantReadWriteLock - 分为前高16位来表示读的状态和低16位来表示写的状态
+      ③ CountDownLatch - 需要 countDown的次数
+      ④ Semaphore - 信号量大小
+    
+   ![AQS](./AQS.png)
+
+   [关于LockSupport的park、unpark方法的底层实现](http://hg.openjdk.java.net/jdk8u/jdk8u/hotspot/file/4ad2d6087d73/src/os/linux/vm/os_linux.cpp)
+    
+### <font color="red">重点：关于AQS与synchronized关键字之间的关系 - 对照理解</font>
+
+    1、synchronized：
+     ①、synchronized关键字在底层的C++实现中，存在两个重要的数据结构（集合）：WaitSet、EntryList
+     ②、WaitSet中存放的是调用了Object的wait方法的线程对象（被封装成了C++的Node对象）    
+     ③、EntryList中存放的是陷入到阻塞状态、需要获取monitor的那些线程对象
+     ④、当一个线程被notify后，它就会从WaitSet中移动到EntryList中
+     ⑤、进入到EntryList后，该线程依然需要与其他线程争抢monitor对象
+     ⑥、如果争抢到，就表示该线程获取到了对象的锁，它就可以以排他方式执行对应的同步代码
+    
+    2、AQS：
+     ①、AQS中存在两种队列，分别是Condition对象上的条件队列wait queue，以及AQS本身的阻塞队列sync queue
+     ②、这两个队列中的每一个对象都是Node实例（里面封装了线程对象）
+     ③、当位于Condition条件队列中的线程被其他线程signal后，该线程就会从条件队列中移动到AQS的阻塞队列中
+     ④、位于AQS阻塞队列中的Node对象本质上都是由一个双向链表来构成的
+     ⑤、在获取AQS锁时，这些进入到阻塞队列中的线程会按照在队列中的排序先后尝试获取锁
+     ⑥、当AQS阻塞队列中的线程获取到锁后，就表示该线程已经可以正常执行了
+     ⑦、陷入到阻塞状态的线程，依然需要进入到操作系统的内核态，进入阻塞（park方法实现）
+    
+    
+
+
+
+### 线程池 ThreadPoolExecutor
+
+
+
+
+
+
+
+
          
