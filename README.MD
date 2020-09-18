@@ -501,10 +501,10 @@ public class Test01 {
      
      对于ReentrantLock来说，其执行逻辑如下所示：
      1. 尝试获取对象的锁，如果获取不到（意味着已经有其他线程持有了锁，并且尚未释放），那么它就会进入到AQS的阻塞队列中。
-     2. 如果获取到，那么根据所是个公平锁还是非公平屁锁来进行不同的处理：
-       ① 如果是公平锁，那么线程会直接放置到AQS阻塞队列的末尾
+     2. 如果获取到，那么根据锁是公平锁还是非公平锁来进行不同的处理：
+       ① 如果是公平锁，那么线程会直接放置到AQS阻塞队列的末尾进行排队
        ② 如果是非公平锁，那么线程会首先尝试进行CAS计算，如果成功，则直接获取到锁
-         如果失败，则与公平锁的处理方式一致，被放到阻塞队列末尾
+         如果失败，则与公平锁的处理方式一致，被放到阻塞队列末尾进行排队，一旦排队，终身排队
      3. 当锁释放时（调用unlock方法），那么底层会调用release方法对state成员变量值进行减一操作，如果减一后，state值不为0
         那么release操作就执行完毕；如果减一操作后，state值为0，则调用LockSupport的unpark方法唤醒该线程后的等待队列中的
         第一个后续线程，将其唤醒，使之能够获取到对象的锁（release时，对于公平锁与非公平锁的处理逻辑是一致的）；之所以调用
@@ -555,6 +555,8 @@ public class Test01 {
 
    [关于LockSupport的park、unpark方法的底层实现](http://hg.openjdk.java.net/jdk8u/jdk8u/hotspot/file/4ad2d6087d73/src/os/linux/vm/os_linux.cpp)
     
+
+
 ### <font color="red">重点：关于AQS与synchronized关键字之间的关系 - 对照理解</font>
 
     1、synchronized：
@@ -575,6 +577,46 @@ public class Test01 {
      ⑦、陷入到阻塞状态的线程，依然需要进入到操作系统的内核态，进入阻塞（park方法实现）
     
     
+
+
+
+### Future、FutureTask（RunnableFuture）、CompletableFuture
+    
+    1、Future
+     表示一个异步计算的结果
+     ① get()/get(time)：获取异步计算的结果，可能会被阻塞
+     ② cancel() ：取消任务
+     ③ isCancelled()：boolean 是否被取消
+     ④ isDone()：是否完成，包括正常执行完成、被取消、抛异常
+
+    2、FutureTask
+     常用的Future实现
+      ① FutureTask(Callable)：Callable参数的构造方法
+      ② FutureTask(Runnable,r)：Runnable参数的构造方法 - 最终会被转换为Callable
+      
+    3、CompletableFuture
+      ① supplyAsync()：有返回结果的异步执行方法
+      ② runAsync()：五返回结果的异步执行方法
+      ③ thenApplyAsync()：继续执行异步方法
+      ④ thenCombineAsync()：合并任务
+      ⑤ whenComplete()：任务完成回调方法
+
+
+
+### ThreadLocal
+    本质上，ThreadLocal是通过空间来换取时间，从而实现每个线程当中都会有一个变量的副本，这样每个线程都会操作该副本，从而完全规避了多线程的并发问题
+    
+    Java中存在的四种类型的引用：
+     1、强引用（strong）：内存不够时，GC也不会回收的对象
+     2、软引用（soft）：内存不够时，GC时会进行回收，内存够时不回收
+     3、弱引用（weak）：发生GC就会回收
+     4、虚引用（phantom）：很少使用，结合引用队列
+     
+     
+     Thread => ThreadLocalMap<Entry<ThreadLocal,Object>>
+   ![](./ThreadLocal.png)
+
+
 
 
 
