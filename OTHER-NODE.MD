@@ -127,7 +127,7 @@ public class T {
 	private int count = 10;
 	private Object o = new Object();
 	
-	public void m() {
+	public void s() {
 		synchronized(o) { //任何线程要执行线面的代码,必须先拿到对象o的锁
 			count--;
 			System.out.println(Thread.currentThread().getName() + " count = " + count);
@@ -173,19 +173,19 @@ public class T {
    是子类对象,打印一下this即可证明:
    ```java
 public class T {
-	synchronized void m() {
-		System.out.println("super m start");
+	synchronized void s() {
+		System.out.println("super s start");
 		System.out.println(this);
 		try {
 			TimeUnit.SECONDS.sleep(1);
 		} catch (InterruptedException e) {
 			e.printStackTrace();
 		}
-		System.out.println("super m end");
+		System.out.println("super s end");
 	}
 	
 	public static void main(String[] args) {
-		new TT().m();
+		new TT().s();
 		System.out.println("---");
 		new TT().m2();
 		System.out.println("---");
@@ -196,24 +196,24 @@ public class T {
 
 class TT extends T {
 	@Override
-	synchronized void m() {
-		System.out.println("child m start");
+	synchronized void s() {
+		System.out.println("child s start");
 		System.out.println(this);
-		super.m();
-		System.out.println("child m end");
+		super.s();
+		System.out.println("child s end");
 	}
 
 	synchronized void m2() {
 		System.out.println("child m2 start");
 		System.out.println(this);
-		super.m();
+		super.s();
 		System.out.println("child m2 end");
 	}
 
 	void m3() {
 		System.out.println("child m2 start");
 		System.out.println(this);
-		super.m();
+		super.s();
 		System.out.println("child m2 end");
 	}
 }
@@ -252,25 +252,25 @@ class TT extends T {
     如果变量a没有加volatile,这时候如果线程t1修改了变量的值,(t1应该会把变动马上同步回共享内存),但是线程t2什么时候去共享内存再次读取同步变量a,不好控制,如果线程2没有去共享内存再次读取同步变量a,那么就看不见线程1的修改后的结果.
     看一个保证线程可见性的例子:
     在一秒后,main线程修改了变量running的值,
-    没有加volatile时,程序会过很久才打印"m end!";
-    加了volatile后,会在一秒后马上打印"m end!"
+    没有加volatile时,程序会过很久才打印"s end!";
+    加了volatile后,会在一秒后马上打印"s end!"
    ```java
 import java.util.concurrent.TimeUnit;
 
 public class T01_HelloVolatile {
     // 对比一下有无volatile的运行结果
 	/*volatile*/ boolean running = true;
-	void m() {
-		System.out.println("m start");
+	void s() {
+		System.out.println("s start");
 		while(running) {
 		}
-		System.out.println("m end!");
+		System.out.println("s end!");
 	}
 	
 	public static void main(String[] args) {
 		T01_HelloVolatile t = new T01_HelloVolatile();
 		
-		new Thread(t::m, "t1").start();
+		new Thread(t::s, "t1").start();
 
 		try {
 			TimeUnit.SECONDS.sleep(1);
@@ -328,7 +328,7 @@ public class Manager {
    ```java
 public class T04_VolatileNotSync {
 	volatile int count = 0;
-	void m() {
+	void s() {
 		for(int i=0; i<10000; i++) {
 		  count++;
 		  /*
@@ -343,7 +343,7 @@ public class T04_VolatileNotSync {
 		T04_VolatileNotSync t = new T04_VolatileNotSync();
 		List<Thread> threads = new ArrayList<Thread>();
 		for(int i=0; i<10; i++) {
-			threads.add(new Thread(t::m, "thread-"+i));
+			threads.add(new Thread(t::s, "thread-"+i));
 		}
 		threads.forEach((o)->o.start());
 		threads.forEach((o)->{
@@ -500,7 +500,7 @@ public class T01_AtomicInteger {
 	
 	AtomicInteger count = new AtomicInteger(0); 
 
-	/*synchronized*/ void m() { 
+	/*synchronized*/ void s() { 
 		for (int i = 0; i < 10000; i++){
 			//if count1.get() < 1000
 			count.incrementAndGet(); //count1++
@@ -511,7 +511,7 @@ public class T01_AtomicInteger {
 		T01_AtomicInteger t = new T01_AtomicInteger();
 		List<Thread> threads = new ArrayList<Thread>();
 		for (int i = 0; i < 10; i++) {
-			threads.add(new Thread(t::m, "thread-" + i));
+			threads.add(new Thread(t::s, "thread-" + i));
 		}
 		threads.forEach((o) -> o.start());
 		threads.forEach((o) -> {
@@ -1725,9 +1725,9 @@ public class M {
    ```java
 public class T01_NormalReference {
     public static void main(String[] args) throws IOException {
-        M m = new M();
+        M s = new M();
         // 如果m不指向null,就不会打印finalize
-        m = null;
+        s = null;
         System.gc(); //DisableExplicitGC
 		// 为了阻塞当前线程,使程序不立即停止
         System.in.read();
@@ -1736,7 +1736,7 @@ public class T01_NormalReference {
 ```
    2、软引用
    
-    SoftReference m = new SoftReference<>(new Object)
+    SoftReference s = new SoftReference<>(new Object)
     如果一个对象,只被一个软引用指向,那么当JVM内存不够用的时候会回收该对象.
     对于软引用关联着的对象，在系统将要发生内存溢出异常之前，将会把这些对象列进回收范围进行第二次回收。
     如果这次回收还没有足够的内存，才会抛出内存溢出异常。
@@ -1748,27 +1748,27 @@ public class T01_NormalReference {
 public class T02_SoftReference {
     public static void main(String[] args) {
     	// 10M的byte数组对象
-        SoftReference<byte[]> m = new SoftReference<>(new byte[1024*1024*10]);
-        //m = null;
-        System.out.println(m.get());
+        SoftReference<byte[]> s = new SoftReference<>(new byte[1024*1024*10]);
+        //s = null;
+        System.out.println(s.get());
         System.gc();
         try {
             Thread.sleep(500);
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
-        System.out.println(m.get());
+        System.out.println(s.get());
         //再分配一个数组，heap将装不下，这时候系统会垃圾回收，先回收一次，如果不够，会把软引用干掉
         // 15M的byte数组对象,如果改为5M的数组则m不会被回收
         byte[] b = new byte[1024*1024*15];
         // 如果m被回收了,则输出为null
-        System.out.println(m.get());
+        System.out.println(s.get());
     }
 }
 ```
    3、弱引用
     
-    WeakReference m = new WeakReference<>(new M());
+    WeakReference s = new WeakReference<>(new M());
     如果一个对象只被弱引用指向,那么只要遭遇到GC就会被回收
     
     一般用在容器里(典型应用:ThreadLocal)
@@ -1778,11 +1778,11 @@ public class T02_SoftReference {
    ```java
 public class T03_WeakReference {
     public static void main(String[] args) {
-        WeakReference<M> m = new WeakReference<>(new M());
+        WeakReference<M> s = new WeakReference<>(new M());
 
-        System.out.println(m.get());
+        System.out.println(s.get());
         System.gc();
-        System.out.println(m.get());
+        System.out.println(s.get());
 
 
         ThreadLocal<M> tl = new ThreadLocal<>();

@@ -91,7 +91,7 @@
 	  4、PTHREAD_MUTEX_ADAPTIVE_NP：适应锁，动作最简单的锁类型，仅仅等待解锁后重新竞争
 	  
 
-注意：<font color="red">**出现异常会导致锁的释放**</font>
+注意：<font color="red">**出现异常会导致锁的释放，o.wait()方法释放锁，o.notify()/o.notifyAll()不释放锁**</font>
 
 ### synchronized 锁升级
  
@@ -578,6 +578,73 @@ public class Test01 {
     
     
 
+### 关于AQS在高版本JDK中的调整
+    1、JDK9设置 head 和 tail 结点时，采用了 VarHandle 
+    2、JDK8设置 head 和 tail 结点时，使用的是 CAS
+    
+    
+    VarHandle：com/shadow/concurrent/other/Test02.java
+     1、普通属性原子性材质
+     2、比反射快，直接操纵二进制码
+     
+
+
+
+
+
+
+### ThreadLocal
+    本质上，ThreadLocal是通过空间来换取时间，从而实现每个线程当中都会有一个变量的副本，这样每个线程都会操作该副本，从而完全规避了多线程的并发问题
+    
+    Java中存在的四种类型的引用：
+     1、强引用（strong）：内存不够时，GC也不会回收的对象
+     2、软引用（soft）：内存不够时，GC时会进行回收，内存够时不回收
+     3、弱引用（weak）：发生GC就会回收
+     4、虚引用（phantom）：很少使用，结合引用队列Queue - 开发JVM会使用到 - Queue中接收到去释放堆外内存
+     
+     - WeakHashMap 的用途
+     
+     Thread => ThreadLocalMap<Entry<ThreadLocal,Object>>
+   ![](./ThreadLocal.png)
+    
+    
+    经典用途：
+    1、Spring声明式事务（传递Connection，多个业务方法获取到同一个Connection对象）
+    2、多数据源的切换
+    3、自定义对象在线程中传递 - 如：用户信息
+
+    ThreadLocal的内存泄漏问题：
+    1、弱引用可以有效的让ThreadLocal对象被回收，但是被回收后 Entry 的key将变成 null，那么 value将不会被访问到，造成内存泄漏
+    2、有效的避免内存泄漏问题，使用完之后调用 ThreadLocal的 remove方法 
+
+
+
+
+
+### 并发容器 CopyOnWriteList、ConcurrentHashMap、ConcurrentSkipListMap、BlockingQueue
+   ![](./Java容器.png)
+    - 建议背过
+    
+   ![](./map.png)
+   
+   ![](./collection.png)
+    
+    1、Vector、Hashtable
+     - 自带锁，基本不用
+    2、HashMap -> ConcurrentHashMap
+     - 各有各的用途、ConcurrentHashMap 读性能优
+    3、Vector -> Queue
+     - Queue 与 List 区别
+      ① 添加了对线程友好的API：offer、peek、poll
+      ② BlockingQueue又添加了 put、take阻塞方法 - 底层 Lock-Condition-park-unpark实现 - 生产者消费者问题
+    4、DelayQueue - PriorityQueue[排序的队列，二叉树]
+     - 按时间进行任务调度
+    5、SynchonouseQueue
+     - 容量为 0 
+     - 功能类似 Exchanger
+    6、TransferQueue
+     - transfer()方法
+     
 
 
 ### Future、FutureTask（RunnableFuture）、CompletableFuture
@@ -600,28 +667,19 @@ public class Test01 {
       ③ thenApplyAsync()：继续执行异步方法
       ④ thenCombineAsync()：合并任务
       ⑤ whenComplete()：任务完成回调方法
-
-
-
-### ThreadLocal
-    本质上，ThreadLocal是通过空间来换取时间，从而实现每个线程当中都会有一个变量的副本，这样每个线程都会操作该副本，从而完全规避了多线程的并发问题
-    
-    Java中存在的四种类型的引用：
-     1、强引用（strong）：内存不够时，GC也不会回收的对象
-     2、软引用（soft）：内存不够时，GC时会进行回收，内存够时不回收
-     3、弱引用（weak）：发生GC就会回收
-     4、虚引用（phantom）：很少使用，结合引用队列
-     
-     
-     Thread => ThreadLocalMap<Entry<ThreadLocal,Object>>
-   ![](./ThreadLocal.png)
-
-
-
-
-
+      
+      
+      
 ### 线程池 ThreadPoolExecutor
 
+
+
+
+
+### 练习题
+    1、多线程A1B2C3...交替打印
+    2、实现一个容器，两个方法 add size，线程1 add元素到容器，线程2监控容器元素个数，个数为5时线程2给出提示
+    3、生产者-消费者问题
 
 
 
