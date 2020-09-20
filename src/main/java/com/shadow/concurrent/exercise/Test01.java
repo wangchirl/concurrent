@@ -1,7 +1,6 @@
 package com.shadow.concurrent.exercise;
 
-import java.util.concurrent.CountDownLatch;
-import java.util.concurrent.TimeUnit;
+import java.util.concurrent.*;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.concurrent.locks.Condition;
 import java.util.concurrent.locks.LockSupport;
@@ -26,9 +25,112 @@ public class Test01 {
 		//m2();
 		// 方式3 - Lock + Condition/await/signal/signalAll => 2个 Condition
 		//m3();
-		// 方式4 - 2个 CountDownLatch
+		// 方式4 - CountDownLatch
 		//m4();
+		// 方式5 - 阻塞队列 - LinkedBlockingQueue
+		//m5();
+		// 方式6 = Exchanger - 不是很可靠（不能保证交换后的打印顺序）
+		//【m6();】
+		// 方式7 - TransferQueue - LinkedTransferQueue
+		//m7();
 	}
+
+	public static void m7() {
+
+		LinkedTransferQueue<Character> queue = new LinkedTransferQueue<>();
+
+		t1 = new Thread(() ->{
+			for (char c : s1) {
+				try {
+					queue.transfer(c);
+					System.out.print(queue.take()); // take()阻塞方法
+				} catch (InterruptedException e) {
+					e.printStackTrace();
+				}
+			}
+		});
+
+		t2 = new Thread(() ->{
+			for (char c : s2) {
+				try {
+					System.out.print(queue.take());
+					queue.transfer(c);
+				} catch (InterruptedException e) {
+					e.printStackTrace();
+				}
+			}
+		});
+
+		t2.start();
+		t1.start();
+
+	}
+
+	public static void m6() {
+		Exchanger<String> exchanger = new Exchanger<>();
+
+		t1 = new Thread(() ->{
+			for (char c : s1) {
+				try {
+					System.out.print(c);
+					exchanger.exchange("T1");
+					TimeUnit.MILLISECONDS.sleep(200); // 不睡眠不能保证交换后先打印t1还是t2
+				} catch (InterruptedException e) {
+					e.printStackTrace();
+				}
+			}
+		});
+
+		t2 = new Thread(() ->{
+			for (char c : s2) {
+				try {
+					exchanger.exchange("T2");
+					System.out.print(c);
+				} catch (InterruptedException e) {
+					e.printStackTrace();
+				}
+			}
+		});
+
+		t1.start();
+		t2.start();
+
+	}
+
+
+	public static void m5() {
+		LinkedBlockingQueue<String> queue1 = new LinkedBlockingQueue<>();
+		LinkedBlockingQueue<String> queue2 = new LinkedBlockingQueue<>();
+
+		t1 = new Thread(() ->{
+			for (char c : s1) {
+				try {
+					queue1.take();
+					System.out.print(c);
+					queue2.put("ok");
+				} catch (InterruptedException e) {
+					e.printStackTrace();
+				}
+			}
+		});
+
+		t2 = new Thread(() ->{
+			for (char c : s2) {
+				try {
+					queue1.put("ok");
+					queue2.take();
+					System.out.print(c);
+				} catch (InterruptedException e) {
+					e.printStackTrace();
+				}
+			}
+		});
+
+		t1.start();
+		t2.start();
+
+	}
+
 
 	public static void m4() {
 
