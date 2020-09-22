@@ -584,7 +584,7 @@ public class Test01 {
     
     
     VarHandle：com/shadow/concurrent/other/Test02.java
-     1、普通属性原子性材质
+     1、普通属性原子性操作
      2、比反射快，直接操纵二进制码
      
 
@@ -1082,8 +1082,38 @@ final void runWorker(Worker w) {
     
     
     
+   3、CompletionService -> ExecutorCompletionService
+      
+      根据执行结果快慢来存储结果，存在一个队列中
+   ```java
+		ExecutorService executorService = new ThreadPoolExecutor(10,20,10,TimeUnit.SECONDS,
+				new LinkedBlockingQueue<>(10),new ThreadPoolExecutor.AbortPolicy());
+
+		CompletionService<Integer> completionService = new ExecutorCompletionService(executorService);
+
+		IntStream.range(0,10).forEach(i ->{
+			completionService.submit(() ->{
+				long time = (long) (Math.random() * 1000);
+				TimeUnit.MILLISECONDS.sleep(time);
+				System.out.println(Thread.currentThread().getName() + ":" + time);
+				return i * i;
+			});
+		});
+
+		for (int i = 0; i < 10; i++) {
+			System.out.println(completionService.take().get());
+		}
+
+		executorService.shutdown();
+```   
     
-    
+### 关于随机数的生成类 Random、ThreadLocalRandom
+    1、对于一个随机数生成器来说，有两个要素需要考量：
+     ① 随机数生成器的种子
+     ② 具体的随机数生成算法（函数）
+     > 根据种子生成下一个随机数，函数固定，上一个生成的随机数将作为生成下一个随机数的种子
+    对于ThreadLocalRandom来说，其随机生成器的种子是存放在每个线程的ThreadLocal中的
+    而Random是会存在多线程争抢的，底层使用了CAS来操作，导致多线程情况下存在性能问题    
           
 
 
