@@ -1,5 +1,7 @@
 package com.shadow.concurrent.threadlocal;
 
+import com.shadow.utils.ConsolePrinter;
+
 import java.util.Random;
 import java.util.concurrent.ThreadLocalRandom;
 import java.util.stream.DoubleStream;
@@ -16,8 +18,8 @@ public class Test03 {
 
 		ThreadLocalRandom localRandom = ThreadLocalRandom.current();
 
-		System.out.println(random.nextInt(100));
-		System.out.println(localRandom.nextInt(100));
+		ConsolePrinter.printlnCyan(random.nextInt(100));
+		ConsolePrinter.printlnCyan(localRandom.nextInt(100));
 
 	}
 }

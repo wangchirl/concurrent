@@ -1,5 +1,7 @@
 package com.shadow.concurrent.lock;
 
+import com.shadow.utils.ConsolePrinter;
+
 import java.util.Random;
 import java.util.concurrent.*;
 
@@ -20,7 +22,7 @@ public class Test05 {
 		// 可重用、可接受 Runnable的参数
 		// CyclicBarrier cyclicBarrier = new CyclicBarrier(3);
 		CyclicBarrier cyclicBarrier = new CyclicBarrier(3,() ->{
-			System.out.println("比赛开始！");
+			ConsolePrinter.printlnCyan("比赛开始！");
 		});
 
 		// 不可重用
@@ -28,7 +30,7 @@ public class Test05 {
 		CountDownLatch countDownLatch2 = new CountDownLatch(3);
 
 		for (int j = 0; j < 2; j++) {
-			System.out.println("第" + (j+1) + "轮比赛开始！");
+			ConsolePrinter.printlnCyan("第" + (j+1) + "轮比赛开始！");
 			for (int i = 0; i < 3; i++) {
 				int finalI = i;
 				int finalJ = j;
@@ -36,13 +38,13 @@ public class Test05 {
 					try {
 						Thread.sleep((long) (Math.random() * 2000));
 						int random = new Random().nextInt(100);
-						System.out.println("sportor" + finalI + " arrived :" + random);
+						ConsolePrinter.printlnCyan("sportor" + finalI + " arrived :" + random);
 
 						cyclicBarrier.await();
 						// 超时会抛异常
 						//cyclicBarrier.await(20,TimeUnit.MILLISECONDS);
 
-						System.out.println("sportor" + finalI +" running :" + random);
+						ConsolePrinter.printlnCyan("sportor" + finalI +" running :" + random);
 						if(finalJ == 0){
 							countDownLatch1.countDown();
 						}else {
@@ -58,7 +60,7 @@ public class Test05 {
 			}else {
 				countDownLatch2.await();
 			}
-			System.out.println("第 " + (j+1) + "轮比赛结束！");
+			ConsolePrinter.printlnCyan("第 " + (j+1) + "轮比赛结束！");
 		}
 	}
 }

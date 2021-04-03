@@ -1,5 +1,7 @@
 package com.shadow.concurrent.threadpool;
 
+import com.shadow.utils.ConsolePrinter;
+
 import java.util.concurrent.*;
 import java.util.stream.IntStream;
 
@@ -19,13 +21,13 @@ public class Test05 {
 			completionService.submit(() ->{
 				long time = (long) (Math.random() * 1000);
 				TimeUnit.MILLISECONDS.sleep(time);
-				System.out.println(Thread.currentThread().getName() + ":" + time);
+				ConsolePrinter.printlnCyan(Thread.currentThread().getName() + ":" + time);
 				return i * i;
 			});
 		});
 
 		for (int i = 0; i < 10; i++) {
-			System.out.println(completionService.take().get());
+			ConsolePrinter.printlnCyan(completionService.take().get());
 		}
 
 		executorService.shutdown();

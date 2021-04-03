@@ -1,5 +1,7 @@
 package com.shadow.concurrent.lock;
 
+import com.shadow.utils.ConsolePrinter;
+
 /**
  * @author shadow
  * @create 2020-09-11
@@ -92,7 +94,7 @@ public class Test03 {
 		while (flag) {
 
 		}
-		System.out.println("method1 invoked...");
+		ConsolePrinter.printlnCyan("method1 invoked...");
 	}
 
 	public void method2() {

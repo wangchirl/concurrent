@@ -1,5 +1,7 @@
 package com.shadow.concurrent.lock;
 
+import com.shadow.utils.ConsolePrinter;
+
 import java.util.concurrent.Semaphore;
 
 /**
@@ -18,9 +20,9 @@ public class Test08 {
 				try {
 					semaphore.acquire();
 					// 业务逻辑
-					System.out.println(finalI + " 抢到车位了！");
+					ConsolePrinter.printlnCyan(finalI + " 抢到车位了！");
 					Thread.sleep(1000);
-					System.out.println(finalI + " 离开车位了！");
+					ConsolePrinter.printlnCyan(finalI + " 离开车位了！");
 				} catch (InterruptedException e) {
 					e.printStackTrace();
 				} finally {

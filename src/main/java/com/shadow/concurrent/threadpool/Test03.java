@@ -1,5 +1,7 @@
 package com.shadow.concurrent.threadpool;
 
+import com.shadow.utils.ConsolePrinter;
+
 import java.io.IOException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -13,7 +15,7 @@ import java.util.concurrent.TimeUnit;
 public class Test03 {
 	public static void main(String[] args) throws IOException {
 		ExecutorService service = Executors.newWorkStealingPool();
-		System.out.println(Runtime.getRuntime().availableProcessors());
+		ConsolePrinter.printlnCyan(Runtime.getRuntime().availableProcessors());
 
 		service.execute(new R(1));
 		service.execute(new R(2));
@@ -36,7 +38,7 @@ public class Test03 {
 		public void run() {
 			try {
 				TimeUnit.SECONDS.sleep(time);
-				System.out.println(Thread.currentThread().getName() + " execute task");
+				ConsolePrinter.printlnCyan(Thread.currentThread().getName() + " execute task");
 			} catch (InterruptedException e) {
 				e.printStackTrace();
 			}

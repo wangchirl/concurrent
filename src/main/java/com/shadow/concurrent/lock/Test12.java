@@ -1,6 +1,8 @@
 package com.shadow.concurrent.lock;
 
 
+import com.shadow.utils.ConsolePrinter;
+
 import java.util.concurrent.locks.Condition;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
@@ -77,7 +79,7 @@ public class Test12 {
                 }
                 // 2.干活
                 number++;
-                System.out.println(Thread.currentThread().getName()+number);
+                ConsolePrinter.printlnCyan(Thread.currentThread().getName()+number);
                 // 3.通知
                 condition1.signalAll();
             }finally {
@@ -95,7 +97,7 @@ public class Test12 {
                 }
                 // 2.干活
                 number--;
-                System.out.println(Thread.currentThread().getName()+number);
+                ConsolePrinter.printlnCyan(Thread.currentThread().getName()+number);
                 // 3.通知
                 condition1.signalAll();
             }finally {
@@ -112,7 +114,7 @@ public class Test12 {
          }
          // 2.干活
          number++;
-         System.out.println(Thread.currentThread().getName()+number);
+         ConsolePrinter.printlnCyan(Thread.currentThread().getName()+number);
          // 3.通知
          this.notifyAll();
          }
@@ -124,7 +126,7 @@ public class Test12 {
          }
          // 2.干活
          number--;
-         System.out.println(Thread.currentThread().getName()+number);
+         ConsolePrinter.printlnCyan(Thread.currentThread().getName()+number);
          // 3.通知
          this.notifyAll();
          } */

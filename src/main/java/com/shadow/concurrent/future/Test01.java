@@ -1,5 +1,7 @@
 package com.shadow.concurrent.future;
 
+import com.shadow.utils.ConsolePrinter;
+
 import java.util.Random;
 import java.util.concurrent.*;
 
@@ -13,11 +15,11 @@ public class Test01 {
 
 		Callable<Integer> callable = () ->{
 
-			System.out.println("pre ...");
+			ConsolePrinter.printlnCyan("pre ...");
 			 Thread.sleep(3000);
 			int nextInt = new Random().nextInt(1000);
 
-			System.out.println("post ...");
+			ConsolePrinter.printlnCyan("post ...");
 			return nextInt;
 		};
 
@@ -26,10 +28,10 @@ public class Test01 {
 		new Thread(futureTask).start();
 
 		Thread.sleep(1000);
-		System.out.println("main thread...");
+		ConsolePrinter.printlnCyan("main thread...");
 
-		System.out.println(futureTask.get()); // get()被阻塞
-		System.out.println(futureTask.get(1,TimeUnit.SECONDS)); // 超时异常，但是子线程的任务不受影响，会继续完成
+		ConsolePrinter.printlnCyan(futureTask.get()); // get()被阻塞
+		ConsolePrinter.printlnCyan(futureTask.get(1,TimeUnit.SECONDS)); // 超时异常，但是子线程的任务不受影响，会继续完成
 
 	}
 }

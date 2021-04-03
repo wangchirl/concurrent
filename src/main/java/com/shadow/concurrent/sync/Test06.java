@@ -1,5 +1,7 @@
 package com.shadow.concurrent.sync;
 
+import com.shadow.utils.ConsolePrinter;
+
 /**
  * @author shadow
  * @create 2020-09-09
@@ -34,7 +36,7 @@ public class Test06 {
 				e.printStackTrace();
 			}
 			synchronized (lock2){
-				System.out.println("method1  invoked...");
+				ConsolePrinter.printlnCyan("method1  invoked...");
 			}
 		}
 	}
@@ -47,7 +49,7 @@ public class Test06 {
 				e.printStackTrace();
 			}
 			synchronized (lock1){
-				System.out.println("method2 invoked...");
+				ConsolePrinter.printlnCyan("method2 invoked...");
 			}
 		}
 	}

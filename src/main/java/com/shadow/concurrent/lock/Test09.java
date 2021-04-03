@@ -1,5 +1,7 @@
 package com.shadow.concurrent.lock;
 
+import com.shadow.utils.ConsolePrinter;
+
 import java.util.concurrent.Phaser;
 import java.util.concurrent.TimeUnit;
 
@@ -31,16 +33,16 @@ public class Test09 {
 		protected boolean onAdvance(int phase, int registeredParties) {
 			switch (phase) {
 				case 0:
-					System.out.println("所有人到齐了！" + registeredParties);
+					ConsolePrinter.printlnCyan("所有人到齐了！" + registeredParties);
 					return false;
 				case 1:
-					System.out.println("所有人吃完了！" + registeredParties);
+					ConsolePrinter.printlnCyan("所有人吃完了！" + registeredParties);
 					return false;
 				case 2:
-					System.out.println("所有人离开了！" + registeredParties);
+					ConsolePrinter.printlnCyan("所有人离开了！" + registeredParties);
 					return false;
 				case 3:
-					System.out.println("婚礼结束，新郎新娘入洞房！" + registeredParties);
+					ConsolePrinter.printlnCyan("婚礼结束，新郎新娘入洞房！" + registeredParties);
 					return true;
 				default:
 					return true;
@@ -58,26 +60,26 @@ public class Test09 {
 
 		public void arrive() {
 			sleep();
-			System.out.println(String.format("%s 到达现场！" , name));
+			ConsolePrinter.printlnCyan(String.format("%s 到达现场！" , name));
 			phaser.arriveAndAwaitAdvance();
 		}
 
 		public void eat() {
 			sleep();
-			System.out.println(String.format("%s 吃完了！" , name));
+			ConsolePrinter.printlnCyan(String.format("%s 吃完了！" , name));
 			phaser.arriveAndAwaitAdvance();
 		}
 
 		public void leave() {
 			sleep();
-			System.out.println(String.format("%s 离开现场！" , name));
+			ConsolePrinter.printlnCyan(String.format("%s 离开现场！" , name));
 			phaser.arriveAndAwaitAdvance();
 		}
 
 		private void hug() {
 			sleep();
 			if(name.equals("新娘") || name.equals("新郎")){
-				System.out.println(String.format("%s 进入洞房！" , name));
+				ConsolePrinter.printlnCyan(String.format("%s 进入洞房！" , name));
 				phaser.arriveAndAwaitAdvance();
 			}else {
 				phaser.arriveAndDeregister();

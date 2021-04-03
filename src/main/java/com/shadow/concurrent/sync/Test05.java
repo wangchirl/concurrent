@@ -1,5 +1,7 @@
 package com.shadow.concurrent.sync;
 
+import com.shadow.utils.ConsolePrinter;
+
 /**
  * @author shadow
  * @create 2020-08-30
@@ -17,13 +19,13 @@ public class Test05 {
 	public void method02() {
 		// Object object = new Object();
 		synchronized (object) {
-			System.out.println("hello");
+			ConsolePrinter.printlnCyan("hello");
 		}
 		synchronized (object) {
-			System.out.println("world");
+			ConsolePrinter.printlnCyan("world");
 		}
 		synchronized (object) {
-			System.out.println("hello world");
+			ConsolePrinter.printlnCyan("hello world");
 		}
 	}
 }

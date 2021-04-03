@@ -1,5 +1,7 @@
 package com.shadow.concurrent.other;
 
+import com.shadow.utils.ConsolePrinter;
+
 import java.lang.ref.PhantomReference;
 import java.lang.ref.ReferenceQueue;
 
@@ -13,8 +15,8 @@ public class PhantomReferenceDemo {
 		Object o = new Object();
 		ReferenceQueue queue = new ReferenceQueue();
 		PhantomReference phantomReference = new PhantomReference(o,queue);
-		System.out.println(o);
-		System.out.println(phantomReference.get());
-		System.out.println(queue.poll());
+		ConsolePrinter.printlnCyan(o);
+		ConsolePrinter.printlnCyan(phantomReference.get());
+		ConsolePrinter.printlnCyan(queue.poll());
 	}
 }

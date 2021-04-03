@@ -1,5 +1,7 @@
 package com.shadow.concurrent.exercise;
 
+import com.shadow.utils.ConsolePrinter;
+
 import java.util.concurrent.*;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.concurrent.locks.Condition;
@@ -43,7 +45,7 @@ public class Test01 {
 			for (char c : s1) {
 				try {
 					queue.transfer(c);
-					System.out.print(queue.take()); // take()阻塞方法
+					ConsolePrinter.printlnCyan(queue.take()); // take()阻塞方法
 				} catch (InterruptedException e) {
 					e.printStackTrace();
 				}
@@ -53,7 +55,7 @@ public class Test01 {
 		t2 = new Thread(() ->{
 			for (char c : s2) {
 				try {
-					System.out.print(queue.take());
+					ConsolePrinter.printlnCyan(queue.take());
 					queue.transfer(c);
 				} catch (InterruptedException e) {
 					e.printStackTrace();
@@ -72,7 +74,7 @@ public class Test01 {
 		t1 = new Thread(() ->{
 			for (char c : s1) {
 				try {
-					System.out.print(c);
+					ConsolePrinter.printlnCyan(c);
 					exchanger.exchange("T1");
 					TimeUnit.MILLISECONDS.sleep(200); // 不睡眠不能保证交换后先打印t1还是t2
 				} catch (InterruptedException e) {
@@ -85,7 +87,7 @@ public class Test01 {
 			for (char c : s2) {
 				try {
 					exchanger.exchange("T2");
-					System.out.print(c);
+					ConsolePrinter.printlnCyan(c);
 				} catch (InterruptedException e) {
 					e.printStackTrace();
 				}
@@ -106,7 +108,7 @@ public class Test01 {
 			for (char c : s1) {
 				try {
 					queue1.take();
-					System.out.print(c);
+					ConsolePrinter.printlnCyan(c);
 					queue2.put("ok");
 				} catch (InterruptedException e) {
 					e.printStackTrace();
@@ -119,7 +121,7 @@ public class Test01 {
 				try {
 					queue1.put("ok");
 					queue2.take();
-					System.out.print(c);
+					ConsolePrinter.printlnCyan(c);
 				} catch (InterruptedException e) {
 					e.printStackTrace();
 				}
@@ -139,7 +141,7 @@ public class Test01 {
 
 		t1 = new Thread(() ->{
 			for (char c : s1) {
-				System.out.print(c);
+				ConsolePrinter.printlnCyan(c);
 				try {
 					latch2.get().countDown();
 					latch2.set(new CountDownLatch(1));
@@ -154,7 +156,7 @@ public class Test01 {
 			for (char c : s2) {
 				try {
 					latch2.get().await();
-					System.out.print(c);
+					ConsolePrinter.printlnCyan(c);
 					latch1.get().countDown();
 					latch1.set(new CountDownLatch(1));
 				} catch (InterruptedException e) {
@@ -192,7 +194,7 @@ public class Test01 {
 			try {
 			 lock.lock();
 				for (char c : s1) {
-					System.out.print(c);
+					ConsolePrinter.printlnCyan(c);
 					condition2.signal();
 					condition1.await();
 				}
@@ -208,7 +210,7 @@ public class Test01 {
 			try{
 				for (char c : s2) {
 					condition2.await();
-					System.out.print(c);
+					ConsolePrinter.printlnCyan(c);
 					condition1.signal();
 				}
 			} catch (InterruptedException e) {
@@ -228,7 +230,7 @@ public class Test01 {
 		t1 = new Thread(() ->{
 			synchronized (lock){
 					for (char c : s1) {
-						System.out.print(c);
+						ConsolePrinter.printlnCyan(c);
 						try {
 							lock.notify();
 							lock.wait();
@@ -245,7 +247,7 @@ public class Test01 {
 				for (char c : s2) {
 					try {
 						lock.wait();
-						System.out.print(c);
+						ConsolePrinter.printlnCyan(c);
 						lock.notify();
 					} catch (InterruptedException e) {
 						e.printStackTrace();
@@ -264,7 +266,7 @@ public class Test01 {
 	public static void m1() {
 		t1 = new Thread(() ->{
 			for (char c : s1) {
-				System.out.print(c);
+				ConsolePrinter.printlnCyan(c);
 				LockSupport.unpark(t2);
 				LockSupport.park();
 			}
@@ -273,7 +275,7 @@ public class Test01 {
 		t2 = new Thread(() ->{
 			for (char c : s2) {
 				LockSupport.park();
-				System.out.print(c);
+				ConsolePrinter.printlnCyan(c);
 				LockSupport.unpark(t1);
 			}
 		});

@@ -1,5 +1,7 @@
 package com.shadow.concurrent.sync;
 
+import com.shadow.utils.ConsolePrinter;
+
 /**
  * @author shadow
  * @create 2020-08-30
@@ -30,7 +32,7 @@ public class Test02 {
 			while (true) {
 				try {
 					Thread.sleep((long) (Math.random() * 1000));
-					System.out.println("result : " + x++);
+					ConsolePrinter.printlnCyan("result : " + x++);
 				} catch (InterruptedException e) {
 					e.printStackTrace();
 				}

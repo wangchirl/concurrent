@@ -1,5 +1,7 @@
 package com.shadow.concurrent.lock;
 
+import com.shadow.utils.ConsolePrinter;
+
 import java.util.Random;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.locks.Lock;
@@ -17,7 +19,7 @@ public class Test01 {
 	public void method1(){
 		try {
 		 	lock.lock();
-			System.out.println("method1 invoked....");
+			ConsolePrinter.printlnCyan("method1 invoked....");
 			// 3、将sleep放到 method1中，method2可能获取到锁
 			// Thread.sleep(new Random().nextInt(2));
 		//} catch (InterruptedException e) {
@@ -30,7 +32,7 @@ public class Test01 {
 	public void method2(){
 		try {
 			lock.lock();
-			System.out.println("method2 invoked....");
+			ConsolePrinter.printlnCyan("method2 invoked....");
 		} finally {
 			lock.unlock();
 		}
@@ -39,9 +41,9 @@ public class Test01 {
 //		try {
 //			boolean result = lock.tryLock(800,TimeUnit.MILLISECONDS);
 //			if(result) {
-//				System.out.println("get the lock");
+//				ConsolePrinter.printlnCyan("get the lock");
 //			}else {
-//				System.out.println("can't get the lock");
+//				ConsolePrinter.printlnCyan("can't get the lock");
 //			}
 //		} catch (InterruptedException e) {
 //			e.printStackTrace();

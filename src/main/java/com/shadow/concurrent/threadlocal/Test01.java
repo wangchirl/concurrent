@@ -1,5 +1,7 @@
 package com.shadow.concurrent.threadlocal;
 
+import com.shadow.utils.ConsolePrinter;
+
 import java.util.concurrent.TimeUnit;
 
 /**
@@ -19,26 +21,26 @@ public class Test01 {
 		threadLocal1.set("hello");
 		threadLocal2.set("are you ok");
 
-		System.out.println(Thread.currentThread().getName() + " => " + threadLocal1.get());
-		System.out.println(Thread.currentThread().getName() + " => " + threadLocal2.get());
+		ConsolePrinter.printlnCyan(Thread.currentThread().getName() + " => " + threadLocal1.get());
+		ConsolePrinter.printlnCyan(Thread.currentThread().getName() + " => " + threadLocal2.get());
 
 		threadLocal1.set("world");
 		threadLocal2.set("i am ok");
-		System.out.println(Thread.currentThread().getName() + " => " + threadLocal1.get());
-		System.out.println(Thread.currentThread().getName() + " => " + threadLocal2.get());
+		ConsolePrinter.printlnCyan(Thread.currentThread().getName() + " => " + threadLocal1.get());
+		ConsolePrinter.printlnCyan(Thread.currentThread().getName() + " => " + threadLocal2.get());
 
 
 		new Thread(() ->{
 			threadLocal1.set("this is static");
-			System.out.println(Thread.currentThread().getName() + " => " + threadLocal1.get());
+			ConsolePrinter.printlnCyan(Thread.currentThread().getName() + " => " + threadLocal1.get());
 			threadLocal2.set("r u ok");
-			System.out.println(Thread.currentThread().getName() + " => " +threadLocal2.get());
+			ConsolePrinter.printlnCyan(Thread.currentThread().getName() + " => " +threadLocal2.get());
 		},"t1").start();
 
 		TimeUnit.SECONDS.sleep(2);
 
-		System.out.println(Thread.currentThread().getName() + " => " + threadLocal1.get());
-		System.out.println(Thread.currentThread().getName() + " => " + threadLocal2.get());
+		ConsolePrinter.printlnCyan(Thread.currentThread().getName() + " => " + threadLocal1.get());
+		ConsolePrinter.printlnCyan(Thread.currentThread().getName() + " => " + threadLocal2.get());
 
 	}
 }

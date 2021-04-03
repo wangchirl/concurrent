@@ -27,15 +27,15 @@
 //	public static void main(String[] args) {
 //		Test02 test02 = new Test02();
 //
-//		System.out.println(handle.get(test02));
+//		ConsolePrinter.printlnCyan(handle.get(test02));
 //		handle.set(test02,10);
-//		System.out.println(test02.x);
+//		ConsolePrinter.printlnCyan(test02.x);
 //
 //		handle.compareAndSet(test02,10,12);
-//		System.out.println(test02.x);
+//		ConsolePrinter.printlnCyan(test02.x);
 //
 //		handle.getAndAdd(test02,10);
-//		System.out.println(test02.x);
+//		ConsolePrinter.printlnCyan(test02.x);
 //
 //
 //	}

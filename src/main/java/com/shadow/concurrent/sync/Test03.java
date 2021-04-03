@@ -1,5 +1,7 @@
 package com.shadow.concurrent.sync;
 
+import com.shadow.utils.ConsolePrinter;
+
 /**
  * @author shadow
  * @create 2020-08-30
@@ -139,16 +141,16 @@ public class Test03 {
 			} catch (InterruptedException e) {
 				e.printStackTrace();
 			}
-			System.out.println("hello");
+			ConsolePrinter.printlnCyan("hello");
 		}
 
 		public static synchronized void world() {
-			System.out.println("world");
+			ConsolePrinter.printlnCyan("world");
 		}
 
 		public void say() {
 			synchronized (this) {
-				System.out.println("hello world!");
+				ConsolePrinter.printlnCyan("hello world!");
 			}
 		}
 	}

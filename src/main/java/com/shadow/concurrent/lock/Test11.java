@@ -1,5 +1,7 @@
 package com.shadow.concurrent.lock;
 
+import com.shadow.utils.ConsolePrinter;
+
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReadWriteLock;
 import java.util.concurrent.locks.ReentrantLock;
@@ -23,7 +25,7 @@ public class Test11 {
 		lock.lock();
 		try {
 			Thread.sleep(1000);
-			System.out.println("lock read...");
+			ConsolePrinter.printlnCyan("lock read...");
 			return count;
 		} catch (InterruptedException e) {
 			e.printStackTrace();
@@ -37,7 +39,7 @@ public class Test11 {
 		lock.lock();
 		try {
 			++count;
-			System.out.println("lock set");
+			ConsolePrinter.printlnCyan("lock set");
 		} finally {
 			lock.unlock();
 		}
@@ -48,7 +50,7 @@ public class Test11 {
 		readLock.lock();
 		try {
 			Thread.sleep(1000);
-			System.out.println("read lock read...");
+			ConsolePrinter.printlnCyan("read lock read...");
 			return count;
 		} catch (InterruptedException e) {
 			e.printStackTrace();
@@ -62,7 +64,7 @@ public class Test11 {
 		writeLock.lock();
 		try {
 			++count;
-			System.out.println("write lock set...");
+			ConsolePrinter.printlnCyan("write lock set...");
 		} finally {
 			writeLock.unlock();
 		}

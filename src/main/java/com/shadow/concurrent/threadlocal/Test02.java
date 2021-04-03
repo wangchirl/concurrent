@@ -1,5 +1,7 @@
 package com.shadow.concurrent.threadlocal;
 
+import com.shadow.utils.ConsolePrinter;
+
 import java.sql.Time;
 import java.util.concurrent.TimeUnit;
 
@@ -19,7 +21,7 @@ public class Test02 {
 			} catch (InterruptedException e) {
 				e.printStackTrace();
 			}
-			System.out.println(Thread.currentThread().getName() + " = " + threadLocal.get());// null
+			ConsolePrinter.printlnCyan(Thread.currentThread().getName() + " = " + threadLocal.get());// null
 		},"t1").start();
 
 		new Thread(()->{
@@ -33,7 +35,7 @@ public class Test02 {
 				e.printStackTrace();
 			}
 
-			System.out.println(Thread.currentThread().getName() + " = " + threadLocal.get().name);
+			ConsolePrinter.printlnCyan(Thread.currentThread().getName() + " = " + threadLocal.get().name);
 		},"t2").start();
 	}
 

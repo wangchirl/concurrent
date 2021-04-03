@@ -1,5 +1,7 @@
 package com.shadow.concurrent.threadpool;
 
+import com.shadow.utils.ConsolePrinter;
+
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -21,17 +23,17 @@ public class Test04 {
 		// normal
 		long start = System.currentTimeMillis();
 		nums.forEach( Test04::isPrime);
-		System.out.println(System.currentTimeMillis() - start);
+		ConsolePrinter.printlnCyan(System.currentTimeMillis() - start);
 
 		// normal stream
 		start = System.currentTimeMillis();
 		nums.stream().forEach( Test04::isPrime);
-		System.out.println(System.currentTimeMillis() - start);
+		ConsolePrinter.printlnCyan(System.currentTimeMillis() - start);
 
 		// parallel
 		start = System.currentTimeMillis();
 		nums.parallelStream().forEach(Test04::isPrime);
-		System.out.println(System.currentTimeMillis() - start);
+		ConsolePrinter.printlnCyan(System.currentTimeMillis() - start);
 
 	}
 

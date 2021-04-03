@@ -1,5 +1,7 @@
 package com.shadow.concurrent.threadpool;
 
+import com.shadow.utils.ConsolePrinter;
+
 import java.util.concurrent.*;
 
 /**
@@ -38,7 +40,7 @@ public class Test01 {
 		for (int i = 0; i < 8; i++) {
 			threadPoolExecutor.submit(() ->{
 				try {
-					System.out.println(Thread.currentThread().getName());
+					ConsolePrinter.printlnCyan(Thread.currentThread().getName());
 					TimeUnit.MILLISECONDS.sleep(100);
 				} catch (Exception e) {
 					e.printStackTrace();
@@ -53,7 +55,7 @@ public class Test01 {
 		@Override
 		public void rejectedExecution(Runnable r, ThreadPoolExecutor executor) {
 			// log
-			System.out.println("log :" + r);
+			ConsolePrinter.printlnCyan("log :" + r);
 		}
 	}
 }

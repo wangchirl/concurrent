@@ -1,5 +1,7 @@
 package com.shadow.concurrent.lock;
 
+import com.shadow.utils.ConsolePrinter;
+
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.IntStream;
@@ -17,7 +19,7 @@ public class Test04 {
 		IntStream.range(0,3).forEach(i -> new Thread(() ->{
 			try {
 			    Thread.sleep(2000);
-				System.out.println("sportor "+ i + " arrived...");
+				ConsolePrinter.printlnCyan("sportor "+ i + " arrived...");
 			} catch (InterruptedException e) {
 				e.printStackTrace();
 			} finally {
@@ -32,6 +34,6 @@ public class Test04 {
 			e.printStackTrace();
 		}
 
-		System.out.println("比赛结束！");
+		ConsolePrinter.printlnCyan("比赛结束！");
 	}
 }

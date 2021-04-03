@@ -1,5 +1,7 @@
 package com.shadow.concurrent.lock;
 
+import com.shadow.utils.ConsolePrinter;
+
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicReference;
@@ -28,45 +30,45 @@ public class Test07 {
 	public static void main(String[] args) throws InterruptedException {
 		AtomicInteger atomicInteger = new AtomicInteger(5);
 
-		System.out.println(atomicInteger.get());
+		ConsolePrinter.printlnCyan(atomicInteger.get());
 		// 返回旧值
-		System.out.println(atomicInteger.getAndSet(8));
+		ConsolePrinter.printlnCyan(atomicInteger.getAndSet(8));
 
-		System.out.println(atomicInteger.get());
+		ConsolePrinter.printlnCyan(atomicInteger.get());
 
-		System.out.println(atomicInteger.getAndIncrement());
+		ConsolePrinter.printlnCyan(atomicInteger.getAndIncrement());
 
-		System.out.println(atomicInteger.get());
+		ConsolePrinter.printlnCyan(atomicInteger.get());
 
 		// ABA 问题
 		AtomicReference<Integer> atomicReference = new AtomicReference<>(100);
 		AtomicStampedReference<Integer> atomicStampedReference = new AtomicStampedReference<Integer>(100,1);
-		System.out.println("===============ABA问题的产生====================");
+		ConsolePrinter.printlnCyan("===============ABA问题的产生====================");
 		new Thread(() -> {
-			System.out.println(atomicReference.compareAndSet(100, 101));
-			System.out.println(atomicReference.compareAndSet(101, 100));
+			ConsolePrinter.printlnCyan(atomicReference.compareAndSet(100, 101));
+			ConsolePrinter.printlnCyan(atomicReference.compareAndSet(101, 100));
 		},"T1").start();
 		new Thread(() -> {
 			try {TimeUnit.SECONDS.sleep(1);} catch (InterruptedException e) {e.printStackTrace();}
-			System.out.println(atomicReference.compareAndSet(100,1) + "\t" + atomicReference.get());
+			ConsolePrinter.printlnCyan(atomicReference.compareAndSet(100,1) + "\t" + atomicReference.get());
 		},"T2").start();
 		try {TimeUnit.SECONDS.sleep(2);} catch (InterruptedException e) {e.printStackTrace();}
 
-		System.out.println("===============ABA问题的解决====================");
+		ConsolePrinter.printlnCyan("===============ABA问题的解决====================");
 		new Thread(() -> {
 			int stamp = atomicStampedReference.getStamp();
-			System.out.println("第一次版本号：" + stamp);
+			ConsolePrinter.printlnCyan("第一次版本号：" + stamp);
 			try {TimeUnit.SECONDS.sleep(1);} catch (InterruptedException e) {e.printStackTrace();}
 			atomicStampedReference.compareAndSet(100,101,stamp,stamp+1);
-			System.out.println("第二次版本号：" + atomicStampedReference.getStamp());
+			ConsolePrinter.printlnCyan("第二次版本号：" + atomicStampedReference.getStamp());
 			atomicStampedReference.compareAndSet(101,100,atomicStampedReference.getStamp(),atomicStampedReference.getStamp()+1);
-			System.out.println("第三次版本号：" + atomicStampedReference.getStamp());
+			ConsolePrinter.printlnCyan("第三次版本号：" + atomicStampedReference.getStamp());
 		},"T3").start();
 		new Thread(() -> {
 			int stamp = atomicStampedReference.getStamp();
-			System.out.println("第一次版本号：" + stamp);
+			ConsolePrinter.printlnCyan("第一次版本号：" + stamp);
 			try {TimeUnit.SECONDS.sleep(3);} catch (InterruptedException e) {e.printStackTrace();}
-			System.out.println(atomicStampedReference.compareAndSet(100, 10, stamp, stamp + 1) + "\t" + atomicStampedReference.getStamp() +"\t" + atomicStampedReference.getReference());
+			ConsolePrinter.printlnCyan(atomicStampedReference.compareAndSet(100, 10, stamp, stamp + 1) + "\t" + atomicStampedReference.getStamp() +"\t" + atomicStampedReference.getReference());
 		},"T3").start();
 	}
 }

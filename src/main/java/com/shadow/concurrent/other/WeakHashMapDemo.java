@@ -1,5 +1,7 @@
 package com.shadow.concurrent.other;
 
+import com.shadow.utils.ConsolePrinter;
+
 import java.util.HashMap;
 import java.util.WeakHashMap;
 
@@ -14,10 +16,10 @@ public class WeakHashMapDemo {
         Integer key = new Integer(1);
         String value = "HashMap";
         map.put(key,value);
-        System.out.println(map); // {1=HashMap}
+        ConsolePrinter.printlnCyan(map); // {1=HashMap}
         key = null;
         System.gc();
-        System.out.println(map); // {1=HashMap}
+        ConsolePrinter.printlnCyan(map); // {1=HashMap}
     }
 
     public static void weakMap(){
@@ -25,9 +27,9 @@ public class WeakHashMapDemo {
         Integer key = new Integer(1);
         String value = "HashMap";
         wmap.put(key,value);
-        System.out.println(wmap); // {1=HashMap}
+        ConsolePrinter.printlnCyan(wmap); // {1=HashMap}
         key = null;
         System.gc();
-        System.out.println(wmap); // {}
+        ConsolePrinter.printlnCyan(wmap); // {}
     }
 }

@@ -1,5 +1,7 @@
 package com.shadow.concurrent.future;
 
+import com.shadow.utils.ConsolePrinter;
+
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.TimeUnit;
 
@@ -12,10 +14,10 @@ public class Test02 {
 	public static void main(String[] args) throws InterruptedException {
 
 		String result = CompletableFuture.supplyAsync(() -> "hello ").thenApplyAsync((i) -> i + " world").join();
-		System.out.println(result);
+		ConsolePrinter.printlnCyan(result);
 
 		CompletableFuture.supplyAsync(() -> "everybody")
-						.thenAcceptAsync((i) -> System.out.println(i + " are you ready"));
+						.thenAcceptAsync((i) -> ConsolePrinter.printlnCyan(i + " are you ready"));
 
 
 		result = CompletableFuture.supplyAsync(() -> {
@@ -34,7 +36,7 @@ public class Test02 {
 			return "world";
 		}),(s1,s2) -> s1 + " | " + s2).join();
 
-		System.out.println(result);
+		ConsolePrinter.printlnCyan(result);
 
 
 		CompletableFuture<Void> completableFuture = CompletableFuture.runAsync(() ->{
@@ -43,12 +45,12 @@ public class Test02 {
 			} catch (InterruptedException e) {
 				e.printStackTrace();
 			}
-			System.out.println("finished");
+			ConsolePrinter.printlnCyan("finished");
 		});
 
-		completableFuture.whenComplete((t,action) -> System.out.println("执行完毕"));
+		completableFuture.whenComplete((t,action) -> ConsolePrinter.printlnCyan("执行完毕"));
 
-		System.out.println("main finished");
+		ConsolePrinter.printlnCyan("main finished");
 
 		TimeUnit.SECONDS.sleep(5);
 	}

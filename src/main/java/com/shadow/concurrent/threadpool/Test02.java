@@ -1,5 +1,7 @@
 package com.shadow.concurrent.threadpool;
 
+import com.shadow.utils.ConsolePrinter;
+
 import java.io.IOException;
 import java.util.Arrays;
 import java.util.Random;
@@ -23,7 +25,7 @@ public class Test02 {
 		for (int i = 0; i < nums.length; i++) {
 			nums[i] = r.nextInt(100);
 		}
-		System.out.println(Arrays.stream(nums).sum());
+		ConsolePrinter.printlnCyan(Arrays.stream(nums).sum());
 	}
 
 	public static void main(String[] args) throws IOException, ExecutionException, InterruptedException {
@@ -31,9 +33,9 @@ public class Test02 {
 		ForkJoinPool forkJoinPool = new ForkJoinPool();
 		ReturnForkJoinTask forkJoinTask = new ReturnForkJoinTask(0, nums.length);
 		forkJoinPool.execute(forkJoinTask);
-		System.out.println(forkJoinTask.get());
+		ConsolePrinter.printlnCyan(forkJoinTask.get());
 
-		System.out.println("=====================");
+		ConsolePrinter.printlnCyan("=====================");
 
 		VoidForkJoinTask voidForkJoinTask = new VoidForkJoinTask(0, nums.length);
 		forkJoinPool.execute(voidForkJoinTask);
@@ -55,7 +57,7 @@ public class Test02 {
 				for (int i = start; i < end; i++) {
 					sum += nums[i];
 				}
-				System.out.println("from:" +start + " to:" + end + "=" + sum);
+				ConsolePrinter.printlnCyan("from:" +start + " to:" + end + "=" + sum);
 			}else {
 				int middle = (end + start) / 2;
 				VoidForkJoinTask voidForkJoinTask1 = new VoidForkJoinTask(start, middle);

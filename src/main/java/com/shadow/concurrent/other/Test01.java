@@ -1,5 +1,7 @@
 package com.shadow.concurrent.other;
 
+import com.shadow.utils.ConsolePrinter;
+
 import java.util.concurrent.atomic.AtomicLong;
 import java.util.concurrent.atomic.LongAdder;
 
@@ -35,7 +37,7 @@ public class Test01 {
 		for (Thread thread : threads) {
 			thread.join();
 		}
-		System.out.println("值为："+ count1 +" sync 耗时：" + (System.currentTimeMillis() - start));
+		ConsolePrinter.printlnCyan("值为："+ count1 +" sync 耗时：" + (System.currentTimeMillis() - start));
 
 		// atomic
 		for (int i = 0; i < threads.length; i++) {
@@ -52,7 +54,7 @@ public class Test01 {
 		for (Thread thread : threads) {
 			thread.join();
 		}
-		System.out.println("值为："+ count2.get() +" atomic 耗时：" + (System.currentTimeMillis() - start));
+		ConsolePrinter.printlnCyan("值为："+ count2.get() +" atomic 耗时：" + (System.currentTimeMillis() - start));
 
 		// longAdder
 		for (int i = 0; i < threads.length; i++) {
@@ -69,7 +71,7 @@ public class Test01 {
 		for (Thread thread : threads) {
 			thread.join();
 		}
-		System.out.println("值为："+ count3.longValue() +" longAdder 耗时：" + (System.currentTimeMillis() - start));
+		ConsolePrinter.printlnCyan("值为："+ count3.longValue() +" longAdder 耗时：" + (System.currentTimeMillis() - start));
 
 
 

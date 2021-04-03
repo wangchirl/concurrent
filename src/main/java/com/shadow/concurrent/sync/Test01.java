@@ -1,5 +1,7 @@
 package com.shadow.concurrent.sync;
 
+import com.shadow.utils.ConsolePrinter;
+
 /**
  * @author shadow
  * @create 2020-08-30
@@ -87,7 +89,7 @@ public class Test01 {
 				}
 			}
 			counter++;
-			System.out.print(counter);
+			ConsolePrinter.printlnCyan(counter);
 			notify();
 		}
 
@@ -101,7 +103,7 @@ public class Test01 {
 				}
 			}
 			counter--;
-			System.out.print(counter);
+			ConsolePrinter.printlnCyan(counter);
 			notify();
 		}
 	}

@@ -1,5 +1,7 @@
 package com.shadow.concurrent.lock;
 
+import com.shadow.utils.ConsolePrinter;
+
 import java.util.Arrays;
 import java.util.Random;
 import java.util.concurrent.locks.Condition;
@@ -79,7 +81,7 @@ public class Test02 {
 					putIndex = 0;
 				}
 				++count; // 元素个数++
-				System.out.println("put element：" + Arrays.toString(container));
+				ConsolePrinter.printlnCyan("put element：" + Arrays.toString(container));
 				notEmptyCondition.signal(); // 唤醒
 			} finally {
 			    lock.unlock();
@@ -98,7 +100,7 @@ public class Test02 {
 					takeIndex = 0;
 				}
 				--count; // 元素个数--
-				System.out.println("take element：" + Arrays.toString(container));
+				ConsolePrinter.printlnCyan("take element：" + Arrays.toString(container));
 				notFullCondition.signal();
 				return res;
 			} finally {

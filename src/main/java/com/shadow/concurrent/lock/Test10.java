@@ -1,5 +1,7 @@
 package com.shadow.concurrent.lock;
 
+import com.shadow.utils.ConsolePrinter;
+
 import java.util.concurrent.Exchanger;
 
 /**
@@ -20,7 +22,7 @@ public class Test10 {
 			} catch (InterruptedException e) {
 				e.printStackTrace();
 			}
-			System.out.println(Thread.currentThread().getName() + " " + s);
+			ConsolePrinter.printlnCyan(Thread.currentThread().getName() + " " + s);
 	},"T1").start();
 
 
@@ -31,7 +33,7 @@ public class Test10 {
 			} catch (InterruptedException e) {
 				e.printStackTrace();
 			}
-			System.out.println(Thread.currentThread().getName() + " " + s);
+			ConsolePrinter.printlnCyan(Thread.currentThread().getName() + " " + s);
 		},"T2").start();
 	}
 }
